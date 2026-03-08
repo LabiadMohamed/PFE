@@ -1,8 +1,13 @@
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import FeatureSection from "./components/FeatureSection";
-import StickySection from "./components/StickySection";
+//import StickySection from "./components/StickySection";
+//import VisionGallery from "./components/VisionGallery";
 import CTA from "./components/CTA";
+import man2 from "./assets/man2.jpg"; // path relative to App.jsx
+import women from "./assets/women.jpeg";
+import glasse14 from "./assets/glasse14.jpeg";
+import Gallery from "./components/gallery";
 
 export default function App() {
   return (
@@ -12,27 +17,29 @@ export default function App() {
       
       <div className="bg-white">
         <FeatureSection 
-          title="Apps leap into your space."
-          description="In visionOS, apps have a new dimension. They can fill the space around you, move anywhere, and scale to the perfect size."
-          placeholderLabel="Product Image Placeholder 1"
+          title="Premium Quality Materials."
+          description="Crafted from high-quality materials to ensure durability, comfort, and timeless elegance, giving every frame a luxurious and lasting presence."
+          imageSrc={man2}
         />
         
         <FeatureSection 
           reversed
-          title="Your room is a theater."
-          description="Transform any room into your own personal theater. Expand your movies, shows, and games to the perfect size while feeling like you're part of the action."
-          placeholderLabel="Product Image Placeholder 2"
+          title="Precision Engineered Design."
+          description="Frames engineered with modern design and perfect balance, combining style and functionality to elevate your everyday look."
+          imageSrc={women}
         />
 
         <FeatureSection 
-          title="Stay connected to others."
-          description="Visionary helps you stay connected to those around you. Eyesight reveals your eyes and lets those nearby know when you're using apps."
-          placeholderLabel="Product Image Placeholder 3"
+          title="Ultimate Comfort Fit."
+          description="Lightweight construction designed for smooth, effortless wear, ensuring your glasses feel as natural as they look."
+            imageSrc={glasse14}
         />
       </div>
 
-      <StickySection />
+      <Gallery />
       
+      {/* <VisionGallery /> */}
+
       <CTA />
     </main>
   );

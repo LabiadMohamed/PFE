@@ -24,3 +24,6 @@
 .placeholder-dark {
   background: linear-gradient(135deg, #1d1d1f 0%, #434344 100%);
 }
+html {
+  scroll-behavior: smooth;
+}
