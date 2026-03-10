@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 
 export default function FeatureSection({imageSrc, title, description, reversed}) {
   return (
-    <section className="py-24 md:py-32 px-4 overflow-hidden" id="section">
+    <section className="py-24 md:py-32 px-4 overflow-hidden" id="features">
       <div className={`max-w-6xl mx-auto flex flex-col ${reversed ? 'md:flex-row-reverse' : 'md:flex-row'} items-center gap-12 md:gap-24`}>
         <motion.div 
           initial={{ opacity: 0, x: reversed ? 50 : -50 }}
