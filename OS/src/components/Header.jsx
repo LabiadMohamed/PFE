@@ -1,60 +1,54 @@
 import React from 'react';
-import '../Header.css';
-import bg3 from "../assets/bg3.png";
 import { Link } from 'react-router-dom';
+import bg3 from "../assets/bg3.png";
 
 function Header() {
   return (
     <div 
-      className="relative w-full h-[calc(100vh-64px)] mt-16  flex items-start justify-start bg-cover bg-center"
-      style={{ backgroundImage: `url(${bg3})` }}
+      className="relative w-full h-[500px] lg:h-[calc(100vh-64px)] mt-16 flex flex-col justify-end md:justify-center md:pt-20   items-start bg-cover  bg-center"
+      style={{ backgroundImage: `url(${bg3})` ,
+      backgroundPosition: window.innerWidth < 768 ? '75% center' : 'center center'
+    }}
     >
-      {/* Glassmorphism Container *  className="bg-white/30 backdrop-blur-md border border-white/20 p-10 md:p-16 rounded-3xl shadow-2xl text-center max-w-3xl mx-4" >*/}
-      <div className=" p-10 md:p-16 mt-35 max-w-3xl mx-4 ms-5" >
+      {/* Overlay to ensure text is readable regardless of the image */}
+      <div className="absolute inset-0 bg-black/10  " />
+
+      <div className="relative z-10 w-full max-w-4xl lg:max-w-3xl  p-7 md:p-16 md:mb-0 md:ml-0 lg:ml-0">
         
-        {/* Title */}
-        <h1  className="text-6xl md:text-8xl font-black tracking-tighter  mb-4">
-        See the World Differently with Our New Eyewear Frames
-        {/*<span className="highlight">STYLE</span>*/}
+        {/* Title: Using a Serif font and responsive sizing */}
+        <h1 className="text-white md:text-[#373535] text-4xl md:text-5xl lg:text-7xl font-medium leading-[1.1] leading-tight tracking-tight mb-4">
+          New frames with a <br className="hidden md:block" /> fresh point of view
         </h1>
 
-        {/* Description */}
-        {/*<div className="text-gray-900 text-lg md:text-xl font-medium mb-10 leading-snug">
-          <p>Premium eyewear crafted for those who see the world differently.</p>
-          <p>Discover the OptiStyle collection.</p>
-        </div>*/}
+        {/* Buttons Container */}
+        {/* Buttons Container: Changed to flex-row by default for mobile */}
+<div className="flex flex-row flex-wrap gap-3 items-center ">
+  <Link 
+    to="/quiz"
+    // Changed w-full to w-auto, and text-lg to text-base for mobile
+    className="w-auto text-center bg-[#0047cc] hover:bg-[#0037a3] text-white px-6 md:px-5 py-3 md:py-3 rounded-full font-semibold text-xs sm:text-sm md:text-lg md:text-base transition-all duration-300 whitespace-nowrap"
+  >
+    Start with a quiz
+  </Link>
 
-        {/* Button */}
-        <div>
-        <Link 
-          to="/shop"
-          id='button'          
-          className="inline-block mt-4  text-white px-4 py-4 rounded-full font-bold shadow-xl hover:bg-[#FF9900] hover:scale-105 transition-all active:scale-95  tracking-wide"
-          style={{ 
-            fontFamily: 'Geometric Sans-Serif', 
-            cursor: 'pointer',
-            boxShadow: '0 10px 20px rgba(12, 12, 13, 0.15)',
-            transition: 'transform 0.2s ease'
-          }}
->
-          View Collection
-        </Link>
+  <Link 
+    to="/shop" 
+    // Changed w-full to w-auto
+    className="w-auto text-center bg-[#001a57] hover:bg-[#000e2e] text-white px-6 md:px-5 py-3 md:py-3 rounded-full font-semibold text-xs sm:text-sm md:text-base text-sm md:text-lg transition-all duration-300 whitespace-nowrap"
+  >
+    Shop eyeglasses
+  </Link>
+</div>
 
-        <Link 
-          to="/shop" 
-          id="button2"        
-          className="inline-block mt-4 ms-5  text-white px-4 py-4 rounded-full font-bold shadow-xl hover:bg-[#FF9900] hover:scale-105 transition-all active:scale-95  tracking-wide"
-          style={{ 
-            
-            fontFamily: 'Geometric Sans-Serif', 
-            cursor: 'pointer',
-            boxShadow: '0 10px 20px rgba(12, 12, 13, 0.15)',
-            transition: 'transform 0.2s ease'
-          }}
->
-        Shope Eyeglasses
-        </Link>
-      </div>
+        {/* New Arrivals Link */}
+        <div className="mt-4">
+          <Link 
+            to="/new-arrivals" 
+            className="text-white md:text-[#292077] font-semibold text-lg hover:underline flex items-center gap-2"
+          >
+            Shop new arrivals <span>→</span>
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -54,58 +54,73 @@ const slides = [
 
 export default function Hero() {
   return (
-    <section id="home" className="relative h-screen bg-white w-full overflow-hidden flex items-center justify-between">
+    <section
+  id="home"
+  className="relative md:mt-32 mt-20 lg:mt-0 h-screen bg-white w-full overflow-hidden flex items-center justify-between flex-col lg:flex-row"
+>
 
-      {/* STATIC TEXT */}
+  {/* TEXT */}
+  <div className="z-10 max-w-md px-6 lg:px-0 text-center lg:text-left lg:absolute lg:left-20">
     
-      <div className="absolute left-20 z-10 max-w-md">
-      
-        <h1 className="text-5xl font-bold  leading-tight"style={{ color: "#292077" }}>
-            Discover <span className="text-[#dfb83a]">Premium Eyewear</span> & Stylish Glasses
-        </h1>
+    <h1
+      className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight"
+      style={{ color: "#292077", fontFamily: "slab serif" }}
+    >
+      Discover <span className="text-[#dfb83a]">Premium Eyewear</span> & Stylish Glasses
+    </h1>
 
-        <p className="mt-4 text-gray-600">
-            Shop modern eyeglasses and luxury frames crafted for comfort, 
-            durability, and crystal-clear vision. Explore designer glasses 
-            that elevate your everyday style.
-        </p>
+    <p className="mt-4 text-gray-600">
+      Shop modern eyeglasses and luxury frames crafted for comfort,
+      durability, and crystal-clear vision. Explore designer glasses
+      that elevate your everyday style.
+    </p>
 
-        <Link
-          to="/products"
-          className="explore-btn mt-6 border inline-flex items-center gap-2 px-4 py-2 text-[#4b45ef] font-semibold hover:text-[#2e05b8] hover:border-[#2e05b8] transition-colors duration-300"
-        >
-          Explore Product
-          <FiArrowRight className="w-4 h-4" />
-        </Link>
+    <Link
+      to="/products"
+      className="explore-btn mt-6 border inline-flex items-center gap-2 px-4 py-2 text-[#4b45ef] font-semibold hover:text-[#2e05b8] hover:border-[#2e05b8] transition-colors duration-300"
+    >
+      Explore Product
+    </Link>
 
-      </div>
+  </div>
 
-      {/* IMAGE SLIDER */}
-      <Swiper
-        modules={[Mousewheel]}
-        loop={true}
-        mousewheel={{
-          forceToAxis: true,
-          sensitivity: 0.5,
-          releaseOnEdges: true,
-        }}
-        slidesPerView={4}
-        speed={1500}
-        className="heroSwiper h-full"
-      >
-        {slides.map((slide, i) => (
-          <SwiperSlide key={i}>
-            <div className="slide-img">
-              <img src={slide.img} alt={slide.title} />
-            </div>
+  {/* SLIDER */}
+  <Swiper
+    modules={[Mousewheel]}
+    loop={true}
+    mousewheel={{
+      forceToAxis: true,
+      sensitivity: 0.5,
+      releaseOnEdges: true,
+    }}
+    speed={1500}
+    className="heroSwiper h-full w-full"
 
-            <div className="slide-img-blur">
-              <img src={slide.img} alt={`${slide.title} blurred`} />
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+    breakpoints={{
+      0: {
+        slidesPerView: 1,
+      },
+      640: {
+        slidesPerView: 2,
+      },
+      1024: {
+        slidesPerView: 4,
+      },
+    }}
+  >
+    {slides.map((slide, i) => (
+      <SwiperSlide key={i}>
+        <div className="slide-img">
+          <img src={slide.img} alt={slide.title} />
+        </div>
 
-    </section>
+        <div className="slide-img-blur">
+          <img src={slide.img} alt={`${slide.title} blurred`} />
+        </div>
+      </SwiperSlide>
+    ))}
+  </Swiper>
+
+</section>
   );
 }

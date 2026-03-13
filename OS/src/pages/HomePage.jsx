@@ -3,7 +3,7 @@ import FeatureSection from "../components/FeatureSection";
 import Gallery from "../components/Gallery";
 import CTA from "../components/CTA";
 import Header from "../components/Header";
-import Vesion from "../components/Gategories";
+import Gategories from "../components/Gategories";
 import Hero2 from "../components/Hero2";
 
 import man2 from "../assets/man2.jpg";
@@ -14,10 +14,10 @@ export default function HomePage() {
   return (
     <main className="min-h-screen">
       <Header />
-
+<Gategories />
       <Hero />
 
-      <Vesion />
+      
 
       {/* <Gat />*/}
 
