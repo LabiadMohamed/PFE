@@ -82,15 +82,8 @@
     }
     
     .slide-content p{
-    font-size:14px;
+    font-size:15px;
     color:rgba(0,0,0,0.8);
-    }
-    
-    .price{
-    font-size:30px;
-    margin:20px 0;
-    font-weight:600;
-    color:#959391;
     }
     
     .explore-btn{

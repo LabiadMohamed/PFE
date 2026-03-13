@@ -1,5 +1,7 @@
 import { Swiper, SwiperSlide } from "swiper/react";
+import { FiArrowRight } from "react-icons/fi";
 import { Mousewheel } from "swiper/modules";
+import { Link } from "react-router-dom";
 
 import "swiper/css";
 import "../heroSlider.css";
@@ -12,109 +14,98 @@ import gold from "../assets/img6.png";
 import glasse15 from "../assets/img5.png";
 
 const slides = [
-{
-title: "VisionComfort Pro",
-price: "$279.00",
-img: glasse15,
-desc: "Modern eyeglasses designed for everyday comfort and clear vision."
-},
-{
-title: "Powerbeats Pro",
-price: "$249.99",
-img: gold,
-desc: "Wireless high-performance earphones with up to 9 hours listening time."
-},
-{
-title: "Classic Premium Glasses",
-price: "$199.00",
-img: glasse5,
-desc: "Stylish and comfortable eyeglasses crafted with durable materials."
-},
-{
-title: "Modern Smart Glasses",
-price: "$299.00",
-img: glasse3,
-desc: "Elegant and lightweight glasses designed for everyday comfort."
-},
-{
-title: "Elegant Vision Glasses",
-price: "$245.00",
-img: glasse11,
-desc: "Premium lenses with modern frame."
-},
-{
-title: "Luxury Vision Glasses",
-price: "$605.00",
-img: glasse4,
-desc: "Luxury eyewear with high quality materials."
-}
+  {
+    title: "VisionComfort Pro",
+    price: "$279.00",
+    img: glasse15,
+    desc: "Modern eyeglasses designed for everyday comfort and clear vision.",
+  },
+  {
+    title: "Powerbeats Pro",
+    price: "$249.99",
+    img: gold,
+    desc: "Wireless high-performance earphones with up to 9 hours listening time.",
+  },
+  {
+    title: "Classic Premium Glasses",
+    price: "$199.00",
+    img: glasse5,
+    desc: "Stylish and comfortable eyeglasses crafted with durable materials.",
+  },
+  {
+    title: "Modern Smart Glasses",
+    price: "$299.00",
+    img: glasse3,
+    desc: "Elegant and lightweight glasses designed for everyday comfort.",
+  },
+  {
+    title: "Elegant Vision Glasses",
+    price: "$245.00",
+    img: glasse11,
+    desc: "Premium lenses with modern frame.",
+  },
+  {
+    title: "Luxury Vision Glasses",
+    price: "$605.00",
+    img: glasse4,
+    desc: "Luxury eyewear with high quality materials.",
+  },
 ];
 
 export default function Hero() {
+  return (
+    <section id="home" className="relative h-screen bg-white w-full overflow-hidden flex items-center justify-between">
 
-return (
+      {/* STATIC TEXT */}
+    
+      <div className="absolute left-20 z-10 max-w-md">
+      
+        <h1 className="text-5xl font-bold  leading-tight"style={{ color: "#292077" }}>
+            Discover <span className="text-[#dfb83a]">Premium Eyewear</span> & Stylish Glasses
+        </h1>
 
-<section id="home" className="relative h-screen w-full overflow-hidden">
+        <p className="mt-4 text-gray-600">
+            Shop modern eyeglasses and luxury frames crafted for comfort, 
+            durability, and crystal-clear vision. Explore designer glasses 
+            that elevate your everyday style.
+        </p>
 
-<Swiper
-modules={[Mousewheel]}
-loop={true}
-mousewheel={{
-  forceToAxis: true,   // only horizontal
-  sensitivity: 0.5,
-  releaseOnEdges: true
-}}
-slidesPerView={4}
-speed={1500}
-className="heroSwiper h-full"
->
+        <Link
+          to="/products"
+          className="explore-btn mt-6 border inline-flex items-center gap-2 px-4 py-2 text-[#4b45ef] font-semibold hover:text-[#2e05b8] hover:border-[#2e05b8] transition-colors duration-300"
+        >
+          Explore Product
+          <FiArrowRight className="w-4 h-4" />
+        </Link>
 
-{slides.map((slide, i) => (
+      </div>
 
-<SwiperSlide key={i}>
+      {/* IMAGE SLIDER */}
+      <Swiper
+        modules={[Mousewheel]}
+        loop={true}
+        mousewheel={{
+          forceToAxis: true,
+          sensitivity: 0.5,
+          releaseOnEdges: true,
+        }}
+        slidesPerView={4}
+        speed={1500}
+        className="heroSwiper h-full"
+      >
+        {slides.map((slide, i) => (
+          <SwiperSlide key={i}>
+            <div className="slide-img">
+              <img src={slide.img} alt={slide.title} />
+            </div>
 
-<div className="slide-content">
+            <div className="slide-img-blur">
+              <img src={slide.img} alt={`${slide.title} blurred`} />
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
 
-<h2>{slide.title}</h2>
-
-<p>{slide.desc}</p>
-
-<div className="price">
-{slide.price}
-</div>
-
-<button className="explore-btn">
-<span>Explore Product</span>
-
-<svg width="16" height="16" viewBox="0 0 16 16">
-<path
-d="M3.33334 12.6667L12.6667 3.33333M12.6667 3.33333H4.66667M12.6667 3.33333V11.3333"
-stroke="currentColor"
-strokeWidth="1.5"
-strokeLinecap="round"
-strokeLinejoin="round"
-/>
-</svg>
-
-</button>
-
-</div>
-
-<div className="slide-img">
-<img src={slide.img} />
-</div>
-
-<div className="slide-img-blur">
-<img src={slide.img} />
-</div>
-
-</SwiperSlide>
-
-))}
-
-</Swiper>
-
-</section>
-
-);
+    </section>
+  );
 }

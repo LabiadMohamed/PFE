@@ -14,7 +14,7 @@ export default function FeatureSection({imageSrc, title, description, reversed})
             <img 
               src={imageSrc} 
               alt={title} 
-              className="w-full h-full object-cover rounded-3xl"
+              className=" w-full h-full object-cover rounded-3xl"
             />
           ) : (
           <span className="text-sm font-mono text-black/20 uppercase tracking-widest">
@@ -30,12 +30,17 @@ export default function FeatureSection({imageSrc, title, description, reversed})
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           className="flex-1 text-center md:text-left"
         >
-          <h2 className="text-3xl md:text-5xl font-semibold tracking-tight mb-6 leading-tight">
-            {title}
-          </h2>
+        <div className="bg-white/30 backdrop-blur-md border border-white/20 p-10 md:p-16 rounded-3xl shadow-2xl text-center max-w-3xl mx-4">
+        <h2
+          className="text-3xl md:text-4xl font-semibold tracking-tight mb-6 leading-tight"
+          style={{ color: "#292077" }}
+    >
+          {title}
+        </h2>
           <p className="text-lg md:text-xl text-apple-dark/60 leading-relaxed max-w-lg">
             {description}
           </p>
+        </div>
         </motion.div>
       </div>
     </section>

@@ -10,6 +10,8 @@
   body {
     @apply bg-white text-apple-dark antialiased overflow-x-hidden;
     font-family: var(--font-sans);
+    background-color: #f1efeb;
+    overflow-x: hidden;
   }
 }
 
@@ -26,4 +28,5 @@
 }
 html {
   scroll-behavior: smooth;
+    overflow-x: hidden;
 }
