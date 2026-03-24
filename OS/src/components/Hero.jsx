@@ -107,6 +107,7 @@ export default function Hero() {
         slidesPerView: 4,
       },
     }}
+    
   >
     {slides.map((slide, i) => (
       <SwiperSlide key={i}>
@@ -120,6 +121,7 @@ export default function Hero() {
       </SwiperSlide>
     ))}
   </Swiper>
+  
 
 </section>
   );

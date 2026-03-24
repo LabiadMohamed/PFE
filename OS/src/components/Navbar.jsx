@@ -1,117 +1,105 @@
-import { motion } from "motion/react";
-import { FiShoppingCart, FiMenu, FiX } from "react-icons/fi";
+import { motion, AnimatePresence } from "framer-motion";
+import { FiShoppingCart, FiMenu, FiX, FiArrowRight } from "react-icons/fi";
 import { useState } from "react";
 import logo from "../assets/Loge.png";
 import { HashLink as Link } from "react-router-hash-link";
-import { HashLink } from "react-router-hash-link/dist/react-router-hash-link.cjs.production";
+import { useLocation } from "react-router-dom"; // Vérifie bien cet import !
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
 
+  // Cette ligne doit être AVANT tout le reste du code
+  if (location.pathname === "/login") {
+    return null; 
+  }
   return (
     <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="fixed top-0 left-0 right-0 z-50 h-16 flex shrink-0 items-center justify-between px-6 bg-transparent opacity-90 backdrop-blur-sm border-b border-gray-200"
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.8, ease: "circOut" }}
+      // Effet flottant : on ajoute une marge et un arrondi
+      className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl h-20 flex items-center justify-between px-8 bg-white/70 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] rounded-3xl"
     >
-      {/* Logo */}
-      <div className="flex items-center">
+      {/* Logo - Animation Scale au Hover */}
+      <motion.div whileHover={{ scale: 1.05 }} className="flex items-center">
         <Link to="/">
-          <img
-            src={logo}
-            alt="OptiStyle Logo"
-            className="mt-11 h-[150px]"
-
-          />
+          <img src={logo} alt="Logo" className="h-16 w-auto object-contain" />
         </Link>
+      </motion.div>
+
+      {/* Desktop Navigation - Liens avec soulignement animé */}
+      <div className="hidden md:flex items-center gap-10">
+        {["Home", "Features", "Shop", "Categories"].map((item) => (
+          <Link
+            key={item}
+            smooth
+            to={`/#${item.toLowerCase()}`}
+            className="relative group text-sm font-semibold text-gray-600 hover:text-black transition-colors"
+          >
+            {item}
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full" />
+          </Link>
+        ))}
       </div>
 
-      {/* Desktop Navigation */}
-      <div className="flex-1 justify-center hidden md:flex">
-        <nav className="flex items-center gap-8 text-[15px] font-medium text-gray-700">
-          <HashLink smooth to="/#home" className="hover:text-black transition-colors">
-            Home
-          </HashLink>
-          <HashLink smooth to="/#features" className="hover:text-black transition-colors">
-            Features
-          </HashLink>
-          <Link smooth to="/#shop" className="hover:text-black transition-colors">
-            Shop
-          </Link>
-          <Link smooth to="/#categories" className="hover:text-black transition-colors">
-            Categories
-          </Link>
-          <a href="#contact" className="hover:text-black transition-colors">
-            Contact
-          </a>
-        </nav>
-      </div>
-
-      {/* Right side */}
-      <div className="flex items-center gap-4 ml-auto">
-        {/* Cart */}
-        <div className="hidden md:flex items-center gap-1 text-gray-800 cursor-pointer hover:text-black">
-          <FiShoppingCart className="w-5 h-5" />
-          <span className="text-sm">Cart</span>
+      {/* Right side - Buttons stylés */}
+      <div className="flex items-center gap-6">
+        {/* Cart avec badge discret */}
+        <div className="relative group cursor-pointer">
+          <FiShoppingCart className="w-6 h-6 text-gray-700 group-hover:text-indigo-600 transition-colors" />
+          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] text-white">
+            0
+          </span>
         </div>
 
-        {/* Login */}
+        {/* Login Button - Gradient & Shadow */}
         <Link
           to="/login"
-          className="hidden md:block px-4 py-1.5 text-sm border border-gray-300 rounded-full hover:bg-gray-100 transition"
+          className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white text-sm font-bold rounded-2xl hover:bg-indigo-600 hover:shadow-lg hover:shadow-indigo-200 transition-all duration-300"
         >
-          Login
+          Login <FiArrowRight />
         </Link>
 
-        {/* Hamburger Button */}
+        {/* Mobile Toggle */}
         <button
-          className="md:hidden text-2xl"
+          className="md:hidden p-2 bg-gray-100 rounded-xl text-2xl"
           onClick={() => setMenuOpen(!menuOpen)}
         >
           {menuOpen ? <FiX /> : <FiMenu />}
         </button>
       </div>
 
-      {/* Mobile Menu */}
-      {menuOpen && (
-        <div className="absolute top-16 left-0 w-full bg-white shadow-md md:hidden">
-          <nav className="flex flex-col items-center gap-6 py-6 text-gray-700 font-medium">
-            <HashLink smooth to="/#home" onClick={() => setMenuOpen(false)}>
-              Home
-            </HashLink>
-
-            <HashLink smooth to="/#features" onClick={() => setMenuOpen(false)}>
-              Features
-            </HashLink>
-
-            <Link smooth to="/#shop" onClick={() => setMenuOpen(false)}>
-              Shop
-            </Link>
-
-            <Link smooth to="/#categories" onClick={() => setMenuOpen(false)}>
-              Categories
-            </Link>
-
-            <a href="#contact" onClick={() => setMenuOpen(false)}>
-              Contact
-            </a>
-
-            <div className="flex items-center gap-2">
-              <FiShoppingCart />
-              Cart
-            </div>
-
+      {/* Mobile Menu - Animation Slide Down */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="absolute top-24 left-0 w-full bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl p-8 flex flex-col items-center gap-6 md:hidden border border-gray-100"
+          >
+            {["Home", "Features", "Shop", "Categories"].map((item) => (
+              <Link
+                key={item}
+                smooth
+                to={`/#${item.toLowerCase()}`}
+                onClick={() => setMenuOpen(false)}
+                className="text-lg font-bold text-gray-800"
+              >
+                {item}
+              </Link>
+            ))}
             <Link
               to="/login"
-              className="px-4 py-2 border rounded-full"
+              className="w-full text-center py-4 bg-indigo-600 text-white rounded-2xl font-bold"
               onClick={() => setMenuOpen(false)}
             >
-              Login
+              Get Started
             </Link>
-          </nav>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.nav>
   );
 }

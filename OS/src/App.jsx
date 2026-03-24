@@ -4,6 +4,9 @@ import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
 import Login from "./pages/Login";
 
+
+
+
 export default function App() {
   return (
     <BrowserRouter>
