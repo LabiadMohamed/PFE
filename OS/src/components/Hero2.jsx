@@ -19,7 +19,7 @@ const WarbyHero = () => {
         */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#dbeaf4] via-[#dbeaf4]/80 to-transparent md:w-3/4 lg:w-1/2 flex flex-col justify-center px-12 md:px-24 py-16">
           
-          <h1 className="text-[42px] md:text-[56px] leading-[1.05] text-[#333333] font-serif mb-10 tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-black tracking-wider uppercase leading-tight text-[#292077] mb-10 drop-shadow-sm">
             Get 15% off <br /> multiple Rx pairs
           </h1>
           

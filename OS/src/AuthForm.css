@@ -168,3 +168,48 @@
 .auth-page .container.active .toggle-panel.toggle-right {
   right: 0;
 }
+/* Forms - Reduced transition from 0.6s to 0.4s and REMOVED the 1.2s delay */
+.auth-page .form-box {
+    position: absolute;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    padding: 40px;
+    /* Speed boost here: */
+    transition: all 0.4s ease-in-out; 
+    z-index: 3;
+}
+
+/* Toggle Background - Reduced from 1.8s to 0.5s for a quick 'swipe' effect */
+.auth-page .toggle-box::before {
+    content: "";
+    position: absolute;
+    left: -250%;
+    width: 300%;
+    height: 100%;
+    background: #7494ec;
+    border-radius: 150px;
+    /* Speed boost here: */
+    transition: all 0.5s ease-in-out;
+    z-index: 1;
+}
+
+/* Toggle Panels - Ensure panels move at the same speed as the background */
+.auth-page .toggle-panel {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 4;
+    pointer-events: auto;
+    /* Match the background speed: */
+    transition: all 0.5s ease-in-out;
+}

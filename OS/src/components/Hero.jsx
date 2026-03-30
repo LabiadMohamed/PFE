@@ -1,6 +1,6 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FiArrowRight } from "react-icons/fi";
-import { Mousewheel } from "swiper/modules";
+import { Mousewheel, Autoplay } from "swiper/modules";
 import { Link } from "react-router-dom";
 
 import "swiper/css";
@@ -62,38 +62,41 @@ export default function Hero() {
   {/* TEXT */}
   <div className="z-10 max-w-md px-6 lg:px-0 text-center lg:text-left lg:absolute lg:left-20">
     
-    <h1
-      className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight"
-      style={{ color: "#292077", fontFamily: "slab serif" }}
-    >
-      Discover <span className="text-[#dfb83a]">Premium Eyewear</span> & Stylish Glasses
+    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-wider uppercase leading-tight mb-6 text-[#292077]">
+      DISCOVER <span className="text-[#d4af37] italic font-serif capitalize font-normal tracking-normal">Premium Eyewear</span> <br/>
+      & STYLISH <span className="text-[#d4af37] italic font-serif capitalize font-normal tracking-normal">Glasses</span>
     </h1>
 
-    <p className="mt-4 text-gray-600">
-      Shop modern eyeglasses and luxury frames crafted for comfort,
+    <p className="mt-6 mb-8 text-lg text-gray-600 italic font-serif leading-relaxed px-4 border-l-4 border-[#d4af37] inline-block text-left">
+      "Shop modern eyeglasses and luxury frames crafted for comfort,
       durability, and crystal-clear vision. Explore designer glasses
-      that elevate your everyday style.
+      that elevate your everyday style."
     </p>
 
     <Link
       to="/products"
-      className="explore-btn mt-6 border inline-flex items-center gap-2 px-4 py-2 text-[#4b45ef] font-semibold hover:text-[#2e05b8] hover:border-[#2e05b8] transition-colors duration-300"
+      className="inline-flex items-center gap-3 px-8 py-4 bg-[#292077] text-white text-sm font-bold uppercase tracking-widest rounded-xl hover:bg-[#d4af37] hover:shadow-[0_10px_30px_rgba(212,175,55,0.3)] transition-all duration-300 group"
     >
-      Explore Product
+      Explore Collection
+      <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
     </Link>
 
   </div>
 
   {/* SLIDER */}
   <Swiper
-    modules={[Mousewheel]}
+    modules={[Mousewheel, Autoplay]}
     loop={true}
+    autoplay={{
+      delay: 1500,
+      disableOnInteraction: false,
+    }}
     mousewheel={{
       forceToAxis: true,
       sensitivity: 0.5,
       releaseOnEdges: true,
     }}
-    speed={1500}
+    speed={800}
     className="heroSwiper h-full w-full"
 
     breakpoints={{
@@ -107,6 +110,7 @@ export default function Hero() {
         slidesPerView: 4,
       },
     }}
+    
   >
     {slides.map((slide, i) => (
       <SwiperSlide key={i}>
@@ -120,6 +124,7 @@ export default function Hero() {
       </SwiperSlide>
     ))}
   </Swiper>
+  
 
 </section>
   );

@@ -15,7 +15,7 @@ export default function Footer() {
         
         {/* Brand & Strange SEO Keyword Section */}
         <div className="col-span-1 md:col-span-1">
-          <h2 style={{ color: colors.gold }} className="text-3xl font-bold mb-4 tracking-tight">
+          <h2 style={{ color: colors.gold }} className="text-3xl font-black uppercase tracking-wider mb-4 drop-shadow-sm">
             OptiStyle
           </h2>
           <p className="text-gray-300 text-sm leading-relaxed mb-6">

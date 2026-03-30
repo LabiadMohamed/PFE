@@ -1,117 +1,149 @@
-import { motion } from "motion/react";
-import { FiShoppingCart, FiMenu, FiX } from "react-icons/fi";
-import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FiShoppingCart, FiMenu, FiX, FiArrowRight } from "react-icons/fi";
+import { useState, useEffect } from "react";
 import logo from "../assets/Loge.png";
 import { HashLink as Link } from "react-router-hash-link";
-import { HashLink } from "react-router-hash-link/dist/react-router-hash-link.cjs.production";
+import { useLocation } from "react-router-dom";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+  const [cartCount, setCartCount] = useState(0);
 
+  useEffect(() => {
+    const updateCount = () => {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const count = cart.reduce((total, item) => total + (item.quantity || 1), 0);
+      setCartCount(count);
+    };
+
+    updateCount();
+    window.addEventListener('storage', updateCount);
+    window.addEventListener('cartUpdated', updateCount);
+    return () => {
+      window.removeEventListener('storage', updateCount);
+      window.removeEventListener('cartUpdated', updateCount);
+    };
+  }, []);
+
+  // Ensure this runs before rendering
+  // Ensure this runs before rendering
+  if (location.pathname === "/login" || location.pathname.startsWith("/vendor")) {
+    return null; 
+  }
   return (
     <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="fixed top-0 left-0 right-0 z-50 h-16 flex shrink-0 items-center justify-between px-6 bg-transparent opacity-90 backdrop-blur-sm border-b border-gray-200"
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.8, ease: "circOut" }}
+      // Floating effect
+      className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl h-20 flex items-center justify-between px-8 bg-white/70 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] rounded-3xl"
     >
-      {/* Logo */}
-      <div className="flex items-center">
-        <Link to="/">
-          <img
-            src={logo}
-            alt="OptiStyle Logo"
-            className="mt-11 h-[150px]"
-
-          />
+      {/* Logo - Scale animation on hover */}
+      <motion.div whileHover={{ scale: 1.05 }} className="flex items-center justify-center">
+        <Link to="/" className="flex items-center h-full pb-1">
+          <img src={logo} alt="Logo" className="h-12 w-auto object-contain" />
         </Link>
-      </div>
+      </motion.div>
 
       {/* Desktop Navigation */}
-      <div className="flex-1 justify-center hidden md:flex">
-        <nav className="flex items-center gap-8 text-[15px] font-medium text-gray-700">
-          <HashLink smooth to="/#home" className="hover:text-black transition-colors">
-            Home
-          </HashLink>
-          <HashLink smooth to="/#features" className="hover:text-black transition-colors">
-            Features
-          </HashLink>
-          <Link smooth to="/#shop" className="hover:text-black transition-colors">
-            Shop
-          </Link>
-          <Link smooth to="/#categories" className="hover:text-black transition-colors">
-            Categories
-          </Link>
-          <a href="#contact" className="hover:text-black transition-colors">
-            Contact
-          </a>
-        </nav>
+      <div className="hidden md:flex items-center gap-10">
+        {["Home", "Features", "Shop", "Categories", "Vendor", "Contact"].map((item) => (
+          item === "Vendor" ? (
+            <Link
+              key={item}
+              to="/vendor/dashboard"
+              className="relative group text-sm font-bold text-[#292077] hover:text-[#d4af37] transition-colors"
+              style={{ marginTop: '2px' }}
+            >
+              Vendor
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#d4af37] transition-all duration-300 group-hover:w-full" />
+            </Link>
+          ) : (
+            <Link
+              key={item}
+              smooth
+              to={item === "Home" ? "/#home" : item === "Contact" ? "/contact" : item === "Shop" ? "/shop" : `/#${item.toLowerCase()}`}
+              className="relative group text-sm font-semibold text-gray-600 hover:text-black transition-colors"
+              style={{ marginTop: '2px' }}
+            >
+              {item}
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full" />
+            </Link>
+          )
+        ))}
       </div>
 
-      {/* Right side */}
-      <div className="flex items-center gap-4 ml-auto">
-        {/* Cart */}
-        <div className="hidden md:flex items-center gap-1 text-gray-800 cursor-pointer hover:text-black">
-          <FiShoppingCart className="w-5 h-5" />
-          <span className="text-sm">Cart</span>
-        </div>
-
-        {/* Login */}
-        <Link
-          to="/login"
-          className="hidden md:block px-4 py-1.5 text-sm border border-gray-300 rounded-full hover:bg-gray-100 transition"
-        >
-          Login
+      {/* Right side - Buttons */}
+      <div className="flex items-center gap-6">
+        {/* Cart with subtle badge */}
+        <Link to="/cart" className="relative group cursor-pointer mr-2">
+          <FiShoppingCart className="w-6 h-6 text-[#292077] hover:text-[#d4af37] transition-colors" />
+          {cartCount > 0 && (
+            <span className="absolute -top-1.5 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#d4af37] text-[10px] font-bold text-white shadow-md">
+              {cartCount}
+            </span>
+          )}
         </Link>
 
-        {/* Hamburger Button */}
+        {/* Login Button - Gradient & Shadow */}
+        <Link
+          to="/login"
+          className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white text-sm font-bold rounded-2xl hover:bg-indigo-600 hover:shadow-lg hover:shadow-indigo-200 transition-all duration-300"
+        >
+          Login <FiArrowRight />
+        </Link>
+
+        {/* Mobile Toggle */}
         <button
-          className="md:hidden text-2xl"
+          className="md:hidden p-2 bg-gray-100 rounded-xl text-2xl"
           onClick={() => setMenuOpen(!menuOpen)}
         >
           {menuOpen ? <FiX /> : <FiMenu />}
         </button>
       </div>
 
-      {/* Mobile Menu */}
-      {menuOpen && (
-        <div className="absolute top-16 left-0 w-full bg-white shadow-md md:hidden">
-          <nav className="flex flex-col items-center gap-6 py-6 text-gray-700 font-medium">
-            <HashLink smooth to="/#home" onClick={() => setMenuOpen(false)}>
-              Home
-            </HashLink>
-
-            <HashLink smooth to="/#features" onClick={() => setMenuOpen(false)}>
-              Features
-            </HashLink>
-
-            <Link smooth to="/#shop" onClick={() => setMenuOpen(false)}>
-              Shop
-            </Link>
-
-            <Link smooth to="/#categories" onClick={() => setMenuOpen(false)}>
-              Categories
-            </Link>
-
-            <a href="#contact" onClick={() => setMenuOpen(false)}>
-              Contact
-            </a>
-
-            <div className="flex items-center gap-2">
-              <FiShoppingCart />
-              Cart
-            </div>
-
+      {/* Mobile Menu - Slide Down Animation */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="absolute top-24 left-0 w-full bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl p-8 flex flex-col items-center gap-6 md:hidden border border-gray-100"
+          >
+            {["Home", "Features", "Shop", "Categories", "Vendor", "Contact"].map((item) => (
+              item === "Vendor" ? (
+                <Link
+                  key={item}
+                  to="/vendor/dashboard"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-lg font-bold text-[#292077]"
+                >
+                  Vendor
+                </Link>
+              ) : (
+                <Link
+                  key={item}
+                  smooth
+                  to={item === "Home" ? "/#home" : item === "Contact" ? "/contact" : item === "Shop" ? "/shop" : `/#${item.toLowerCase()}`}
+                  onClick={() => setMenuOpen(false)}
+                  className="text-lg font-bold text-gray-800"
+                >
+                  {item}
+                </Link>
+              )
+            ))}
             <Link
               to="/login"
-              className="px-4 py-2 border rounded-full"
+              className="w-full text-center py-4 bg-indigo-600 text-white rounded-2xl font-bold"
               onClick={() => setMenuOpen(false)}
             >
-              Login
+              Get Started
             </Link>
-          </nav>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.nav>
   );
 }
