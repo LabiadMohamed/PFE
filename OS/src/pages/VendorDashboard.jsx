@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+
 import { 
   LayoutDashboard, ShoppingCart, PackageSearch, PlusCircle, Bell, Search, 
   Wallet, TrendingUp, Clock, MoreHorizontal, UploadCloud, ChevronRight, User
@@ -13,24 +14,24 @@ const SIDEBAR_ITEMS = [
 ];
 
 const STATS = [
-  { id: 1, title: 'Total Revenue', value: '$124,500.00', icon: Wallet },
-  { id: 2, title: 'Balance', value: '$45,200.00', icon: TrendingUp },
-  { id: 3, title: 'Pending', value: '$12,300.00', icon: Clock },
+  { id: 1, title: 'Total Revenue', value: '720.00 dh', icon: Wallet },
+  { id: 2, title: 'Balance', value: '700.00 dh', icon: TrendingUp },
+  { id: 3, title: 'Pending', value: '600.00 dh', icon: Clock },
 ];
 
 const RECENT_ORDERS = [
-  { id: '#ORD-9932', product: 'Aura Titanium', date: 'Oct 24, 2026', price: '$450.00', status: 'Processing' },
-  { id: '#ORD-9931', product: 'Eclipse Aviator', date: 'Oct 24, 2026', price: '$320.00', status: 'Shipped' },
-  { id: '#ORD-9930', product: 'Nova Classic', date: 'Oct 23, 2026', price: '$290.00', status: 'Delivered' },
-  { id: '#ORD-9929', product: 'Lumina Frames', date: 'Oct 23, 2026', price: '$180.00', status: 'Pending' },
-  { id: '#ORD-9928', product: 'Velocity Sport', date: 'Oct 22, 2026', price: '$210.00', status: 'Delivered' },
+  { id: '#ORD-9932', product: 'Aura Titanium', date: 'Oct 24, 2026', price: '450.00 dh', status: 'Processing' },
+  { id: '#ORD-9931', product: 'Eclipse Aviator', date: 'Oct 24, 2026', price: '320.00 dh', status: 'Shipped' },
+  { id: '#ORD-9930', product: 'Nova Classic', date: 'Oct 23, 2026', price: '290.00 dh', status: 'Delivered' },
+  { id: '#ORD-9929', product: 'Lumina Frames', date: 'Oct 23, 2026', price: '180.00 dh', status: 'Pending' },
+  { id: '#ORD-9928', product: 'Velocity Sport', date: 'Oct 22, 2026', price: '210.00 dh', status: 'Delivered' },
 ];
 
 const INVENTORY = [
-  { id: 'PRD-001', name: 'Aura Titanium', image: 'https://images.unsplash.com/photo-1577803645773-f96470509666?q=80&w=400', stock: 124, price: '$450.00' },
-  { id: 'PRD-002', name: 'Eclipse Aviator', image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=400', stock: 8, price: '$320.00' },
-  { id: 'PRD-003', name: 'Nova Classic', image: 'https://images.unsplash.com/photo-1508296695146-257a814070b4?q=80&w=400', stock: 85, price: '$290.00' },
-  { id: 'PRD-004', name: 'Lumina Frames', image: 'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?q=80&w=400', stock: 0, price: '$180.00' },
+  { id: 'PRD-001', name: 'Aura Titanium', image: '/images/men/b.jfif', stock: 124, price: '450.00 dh' },
+
+  { id: 'PRD-002', name: 'Nova Classic', image: '/images/women/bbb.jfif', stock: 85, price: '290.00 dh' },
+  
 ];
 
 const VendorDashboard = () => {
@@ -216,9 +217,7 @@ const VendorDashboard = () => {
       {/* SIDEBAR */}
       <aside className="sticky top-0 h-screen w-64 bg-white border-r border-[#292077]/10 flex flex-col shrink-0 z-20">
         <div className="h-24 flex items-center px-8 border-b border-[#292077]/5">
-          <div className="w-10 h-10 bg-[#292077] rounded-xl flex items-center justify-center mr-3 shadow-lg shadow-[#292077]/20">
-            <span className="font-black text-[#d4af37] text-xl leading-none">O</span>
-          </div>
+          
           <h1 className="text-xl font-black tracking-wider uppercase">Opti<span className="text-[#d4af37] italic font-serif capitalize font-normal tracking-normal text-lg">Style</span></h1>
         </div>
 
@@ -251,7 +250,7 @@ const VendorDashboard = () => {
             </div>
             <div className="text-left">
               <p className="text-xs font-black text-[#292077] uppercase tracking-wider">Store Admin</p>
-              <p className="text-[10px] font-serif italic text-gray-500 mt-0.5">Vendor Account</p>
+              <p className="text-[10px] font-serif italic text-gray-500 mt-0.5">Partner Account</p>
             </div>
           </div>
         </div>
@@ -300,7 +299,7 @@ const VendorDashboard = () => {
         {/* FOOTER */}
         <footer className="border-t border-[#292077]/10 mt-auto py-8 px-10 bg-white">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-xs font-serif italic text-gray-500">OptiStyle © 2024. All rights reserved.</p>
+            <p className="text-xs font-serif italic text-gray-500">OptiStyle © 2026. All rights reserved.</p>
             <div className="flex gap-6 text-[10px] font-black uppercase tracking-widest text-[#292077]/60">
               <a href="#" className="hover:text-[#d4af37] transition-colors">Terms of Service</a>
               <a href="#" className="hover:text-[#d4af37] transition-colors">Privacy Policy</a>

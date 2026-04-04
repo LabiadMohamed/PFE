@@ -1,5 +1,6 @@
 import React from 'react';
 import bg2 from "../assets/bg2.avif";
+import { Link } from "react-router-dom";
 
 const WarbyHero = () => {
   return (
@@ -31,11 +32,11 @@ const WarbyHero = () => {
               Shop sunglasses
             </button>
           </div>
-
-          <a href="#" className="text-[#1d52ce] font-bold text-[15px] flex items-center group hover:underline">
-            Start with a quiz 
-            <span className="ml-2 text-xl mb-1 group-hover:translate-x-1 transition-transform inline-block">›</span>
-          </a>
+<Link to="/about" className="text-[#1d52ce] font-bold text-[15px] flex items-center group hover:underline">
+  about us
+  <span className="ml-2 text-xl mb-1 group-hover:translate-x-1 transition-transform inline-block">›</span>
+</Link>
+          
         </div>
 
       </section>

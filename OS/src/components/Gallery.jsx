@@ -4,35 +4,35 @@ import { Quote, Star, ShieldCheck, CreditCard, Shield, CheckCircle } from 'lucid
 const REVIEWS = [
   {
     id: 1,
-    name: "Sarah M.",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200",
+    name: "Ressa Mohamed Amine.",
+    image: "/images/rev/a.jpeg",
     text: "Absolutely stunning glasses. The attention to detail and optical clarity is unlike anything I've experienced before.",
     verified: true
   },
   {
     id: 2,
-    name: "James L.",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200",
+    name: "Mohamed Labiad.",
+    image: "/images/rev/b.jpeg",
     text: "The delivery was incredibly fast and the packaging itself felt like a luxury unboxing experience.",
     verified: true
   },
   {
     id: 3,
-    name: "Elena R.",
-    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
+    name: "Aya Lahrar.",
+    image: "/images/rev/c.jpeg",
     text: "Perfect fit from day one. These frames exude elegance without compromising on daily comfort.",
     verified: true
   },
   {
     id: 4,
-    name: "Michael T.",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200",
+    name: "Ayman Benai.",
+    image: "/images/rev/d.jpeg",
     text: "A truly premium brand. The golden accents on my new shades are breathtaking and completely durable.",
     verified: true
   },
   {
     id: 5,
-    name: "Amina B.",
+    name: "Douae maauoch.",
     image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200",
     text: "Their customer service is peerless. The bespoke style of Optistyle Premium sets a new standard for optical fashion.",
     verified: true
