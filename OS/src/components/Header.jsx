@@ -1,6 +1,6 @@
 
 import React from "react";
-import bgVideo from "../assets/watermarked_preview.mp4";
+import bgVideo from "../assets/a.mp4";
 
 
 export default function Header() {
@@ -18,16 +18,16 @@ export default function Header() {
       </video>
 
       {/* Elegant Overlay Gradient for better text readability */}
-      <div className="absolute inset-0  pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#292077]/50 via-transparent to-[#0a0a0c] pointer-events-none opacity-80" />
+     {/* <div className="absolute inset-0  pointer-events-none bg-black/15" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#292077]/50 via-transparent to-[#0a0a0c] pointer-events-none opacity-80" />**/}
 
       {/* Centered Typography */}
       <div className="relative z-10 text-center px-6 mt-16 md:mt-0">
-        <h1 className="text-4xl sm:text-6xl lg:text-[75px] font-black text-white uppercase tracking-wider drop-shadow-2xl mb-4 leading-[1.1]">
+        <h1 className="text-4xl sm:text-6xl lg:text-[75px] font-black text-white capitalize  drop-shadow-2xl mb-4 leading-[1.1]">
           Opti<span className="text-[#d4af37] italic font-serif tracking-normal capitalize font-normal">Style</span>
         </h1>
 
-        <p className="text-gray-300 text-xs md:text-sm font-bold tracking-[0.4em] uppercase max-w-xl mx-auto drop-shadow-md">
+        <p className="text-bleu-300 text-xs md:text-sm font-bold  uppercase max-w-xl mx-auto drop-shadow-md">
           Experience the pinnacle of clarity and design
         </p>
 
@@ -40,4 +40,4 @@ export default function Header() {
       </div>  
     </div>
   );
-} 
+}

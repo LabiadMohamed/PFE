@@ -4,8 +4,8 @@ import { Send, User } from 'lucide-react';
 
 const Comments = () => {
   const [comments, setComments] = useState([
-    { id: 1, name: "Sarah M.", text: "Absolutely love the new collection! The frames are unmatched.", date: "2 hours ago" },
-    { id: 2, name: "James T.", text: "The Titanium frames are lighter than I expected. Great purchase.", date: "1 day ago" }
+    { id: 1, name: "Mohamed amine ressa .", text: "Absolutely love the new collection! The frames are unmatched.", date: "2 hours ago" },
+    { id: 2, name: "Mohamed labiad.", text: "The Titanium frames are lighter than I expected. Great purchase.", date: "1 day ago" }
   ]);
   const [newComment, setNewComment] = useState("");
   const [name, setName] = useState("");

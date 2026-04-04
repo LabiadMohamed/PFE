@@ -4,9 +4,11 @@ import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
 import Login from "./pages/Login";
 import Cart from "./pages/Cart";
+import About from "./pages/About";
 import Contact from "./pages/Contact";
 import VendorDashboard from "./pages/VendorDashboard";
-import Shop from "./pages/Shop";
+import Shop from "./pages/shop";
+
 
 
 
@@ -24,6 +26,7 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/cart" element={<Cart />} />
+         <Route path="/About" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/vendor/dashboard" element={<VendorDashboard />} />

@@ -6,12 +6,12 @@ import { Link } from "react-router-dom";
 import "swiper/css";
 import "../heroSlider.css";
 
-import glasse4 from "../assets/img1.png";
-import glasse3 from "../assets/img2.png";
-import glasse5 from "../assets/img3.png";
-import glasse11 from "../assets/img4.png";
-import gold from "../assets/img6.png";
-import glasse15 from "../assets/img5.png";
+import glasse4 from "../assets/ee.png";
+import glasse3 from "../assets/c.png";
+import glasse5 from "../assets/h.png";
+import glasse11 from "../assets/bbb.png";
+import gold from "../assets/aaaa.png";
+import glasse15 from "../assets/cs.png";
 
 const slides = [
   {
@@ -28,25 +28,25 @@ const slides = [
   },
   {
     title: "Classic Premium Glasses",
-    price: "$199.00",
+    price: "700.00 dh",
     img: glasse5,
     desc: "Stylish and comfortable eyeglasses crafted with durable materials.",
   },
   {
     title: "Modern Smart Glasses",
-    price: "$299.00",
+    price: "299.00 dh",
     img: glasse3,
     desc: "Elegant and lightweight glasses designed for everyday comfort.",
   },
   {
     title: "Elegant Vision Glasses",
-    price: "$245.00",
+    price: "245.00 dh",
     img: glasse11,
     desc: "Premium lenses with modern frame.",
   },
   {
     title: "Luxury Vision Glasses",
-    price: "$605.00",
+    price: "605.00 dh",
     img: glasse4,
     desc: "Luxury eyewear with high quality materials.",
   },
@@ -64,7 +64,7 @@ export default function Hero() {
     
     <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-wider uppercase leading-tight mb-6 text-[#292077]">
       DISCOVER <span className="text-[#d4af37] italic font-serif capitalize font-normal tracking-normal">Premium Eyewear</span> <br/>
-      & STYLISH <span className="text-[#d4af37] italic font-serif capitalize font-normal tracking-normal">Glasses</span>
+      
     </h1>
 
     <p className="mt-6 mb-8 text-lg text-gray-600 italic font-serif leading-relaxed px-4 border-l-4 border-[#d4af37] inline-block text-left">
@@ -74,7 +74,7 @@ export default function Hero() {
     </p>
 
     <Link
-      to="/products"
+      to="/shop"
       className="inline-flex items-center gap-3 px-8 py-4 bg-[#292077] text-white text-sm font-bold uppercase tracking-widest rounded-xl hover:bg-[#d4af37] hover:shadow-[0_10px_30px_rgba(212,175,55,0.3)] transition-all duration-300 group"
     >
       Explore Collection

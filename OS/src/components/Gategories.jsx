@@ -3,10 +3,10 @@ import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { Glasses, Sun, Diamond, Stethoscope, ArrowRight } from 'lucide-react';
 
-import g4 from "../assets/g4.jpeg";
 import g2 from "../assets/g2.jpeg";
+import g4 from "../assets/g4.jpeg";
 import glass13 from "../assets/glass13.jpeg";
-import g1 from "../assets/g1.jpeg";
+
 
 const categories = [
   {
@@ -15,8 +15,8 @@ const categories = [
     subtitle: "Everyday clarity",
     desc: "Discover our premium selection of optical frames crafted for durability and all-day comfort. Experience vision like never before.",
     icon: Glasses,
-    image: g4,
-    link: "/eyeglasses"
+    image: g2,
+    link: "/shop"
   },
   {
     id: "02",
@@ -24,8 +24,8 @@ const categories = [
     subtitle: "UV Protection",
     desc: "Elevate your outdoor style with our luxury prescription sunglasses, offering maximum UV protection without compromising elegance.",
     icon: Sun,
-    image: g2,
-    link: "/sunglasses"
+    image: g4,
+    link: "/shop"
   },
   {
     id: "03",
@@ -34,17 +34,9 @@ const categories = [
     desc: "Indulge in our exclusive boutique collection. Handmade frames with exquisite detailing and uncompromising luxurious quality.",
     icon: Diamond,
     image: glass13,
-    link: "/contacts"
+    link: "/shop"
   },
-  {
-    id: "04",
-    title: "EYE EXAMS",
-    subtitle: "Professional care",
-    desc: "Book a comprehensive eye examination with our top-tier optometrists ensuring your vision stays perfect year-round.",
-    icon: Stethoscope,
-    image: g1,
-    link: "/exams"
-  }
+  
 ];
 
 export default function Visionary() {
@@ -74,7 +66,7 @@ export default function Visionary() {
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12 mb-16">
         {/* Header */}
         <div className="text-center">
-          <h2 className="text-4xl md:text-5xl font-black text-[#292077] uppercase tracking-wide">
+          <h2 className="text-4xl md:text-5xl font-black text-[#292077]  capitalize tracking-wide">
             Product <span className="text-[#d4af37] italic font-serif capitalize font-normal">Categories</span>
           </h2>
           <p className="mt-4 text-gray-500 max-w-2xl mx-auto text-lg">

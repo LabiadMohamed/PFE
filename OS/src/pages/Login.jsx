@@ -4,7 +4,7 @@ import { Mail, Lock, Eye, EyeOff, Shield, Sparkles, User, Briefcase, ChevronLeft
 import { Link } from 'react-router-dom';
 
 // Import images
-import clientBg from "../assets/bg2.avif";
+import clientBg from "../assets/ay.jpeg";
 import vendorBg from "../assets/g4.jpeg";
 
 const Login = () => {
@@ -86,7 +86,7 @@ const Login = () => {
 
       <Link to="/" className="absolute top-8 left-8 z-50 text-white/50 hover:text-white transition-colors flex items-center gap-2 group">
         <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-        <span className="text-sm font-bold tracking-widest uppercase font-sans">Back</span>
+        <span className="text-sm font-bold tracking-widest uppercase font-sans"></span>
       </Link>
 
       {/* The Elite Card: Spring Elastic Slide-Up */}
@@ -111,9 +111,9 @@ const Login = () => {
             </motion.div>
 
             {/* Massive Heading with MANDATORY Dual-Tone Styling */}
-            <h2 className="text-4xl lg:text-5xl font-black uppercase text-[#292077] font-sans leading-[1.05] tracking-tight mt-8 drop-shadow-[0_0_15px_rgba(255,255,255,0.9)]">
+            <h2 className="text-4xl lg:text-5xl font-black uppercase text-white font-sans leading-[1.05] tracking-tight mt-8 drop-shadow-[0_0_15px_rgba(255,255,255,0.9)]">
               {isLogin ? (
-                <>WELCOME <br /><span className="text-[#d4af37] italic font-serif capitalize font-normal tracking-normal drop-shadow-none">Back!</span></>
+                <>WELCOME <br /><span className="text-[#d4af37] italic font-serif capitalize font-normal tracking-normal drop-shadow-none">back!</span></>
               ) : (
                 <>HELLO, <br /><span className="text-[#d4af37] italic font-serif capitalize font-normal tracking-normal drop-shadow-none">Welcome!</span></>
               )}
@@ -146,7 +146,7 @@ const Login = () => {
           <div className="mb-8 text-center md:text-left">
             <h1 className="text-3xl lg:text-4xl font-black uppercase text-[#292077] font-sans tracking-wider mb-2 drop-shadow-sm">
               {isLogin ? (
-                <>LOGIN <br className="hidden md:block"/><span className="text-[#d4af37] italic font-serif capitalize font-normal tracking-normal drop-shadow-none">Securely</span></>
+                <>LOGIN <br className="hidden md:block"/><span className="text-[#d4af37] italic font-serif capitalize font-normal tracking-normal drop-shadow-none"></span></>
               ) : (
                 <>REGISTRATION <br className="hidden md:block"/><span className="text-[#d4af37] italic font-serif capitalize font-normal tracking-normal drop-shadow-none">Portal</span></>
               )}
@@ -175,7 +175,7 @@ const Login = () => {
               onClick={() => setRole('vendor')}
               className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-[11px] md:text-xs font-bold uppercase tracking-widest font-sans transition-colors duration-300 ${role === 'vendor' ? 'text-white' : 'text-gray-400 hover:text-[#292077]'}`}
             >
-              <Briefcase className="w-3.5 h-3.5" /> Vendor
+              <Briefcase className="w-3.5 h-3.5" /> Partner
             </button>
           </div>
 

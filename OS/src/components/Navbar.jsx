@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, color } from "framer-motion";
 import { FiShoppingCart, FiMenu, FiX, FiArrowRight } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import logo2 from "../assets/Logo2.jpeg";
@@ -28,7 +28,9 @@ export default function Navbar() {
 
     updateCount();
     window.addEventListener("cartUpdated", updateCount);
+    window.addEventListener("storage", updateCount);
     return () => {
+      window.removeEventListener("storage", updateCount);
       window.removeEventListener("cartUpdated", updateCount);
     };
   }, []);
@@ -65,7 +67,7 @@ export default function Navbar() {
               className="relative group text-sm font-bold text-[#292077] hover:text-[#d4af37] transition-colors"
               style={{ marginTop: "2px" }}
             >
-              Vendor
+              Partner
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#d4af37] transition-all duration-300 group-hover:w-full" />
             </Link>
             );
@@ -109,7 +111,7 @@ export default function Navbar() {
         {/* Login Button - Gradient & Shadow */}
         <Link
           to="/login"
-          className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white text-sm font-bold rounded-2xl hover:bg-indigo-600 hover:shadow-lg hover:shadow-indigo-200 transition-all duration-300"
+          className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-[#dfb83a] text-white text-sm font-bold rounded-2xl hover:bg-indigo-600 hover:shadow-lg hover:shadow-indigo-200 transition-all duration-300"
         >
           Login <FiArrowRight />
         </Link>
@@ -170,7 +172,7 @@ export default function Navbar() {
             })}
             <Link
               to="/login"
-              className="w-full text-center py-4 bg-indigo-600 text-white rounded-2xl font-bold"
+              className="w-full text-center py-4 bg-indigo-600 text-white bg-[#dfb83a] rounded-2xl font-bold"
               onClick={() => setMenuOpen(false)}
             >
               Get Started

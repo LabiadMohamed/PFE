@@ -1,35 +1,35 @@
 import React from "react";
-import { Mail, Phone, Linkedin, Github } from "lucide-react";
+import { Mail, Phone, Linkedin,  } from "lucide-react";
 import CTA from "../components/CTA";
 
 const TEAM = [
   {
-    name: "Aya Lahrar",
-    role: "Co-Founder & Lead Designer",
-    email: "aya.lahrar@optistyle.com",
-    phone: "+212 600 000 001",
-    image: "https://ui-avatars.com/api/?name=Aya+Lahrar&background=292077&color=fff&size=200"
-  },
-  {
     name: "Amine Ressa",
-    role: "Chief Technology Officer",
+    role: "Co-Founder & Lead Designer",
     email: "amine.ressa@optistyle.com",
-    phone: "+212 600 000 002",
-    image: "https://ui-avatars.com/api/?name=Amine+Ressa&background=d4af37&color=fff&size=200"
+    phone: "+212 649 685 851",
+    image: "/images/rev/cc.jpeg"
   },
   {
-    name: "Labiad Mohamed",
+    name: "Aya Lahrar",
+    role: "Chief Technology Officer",
+    email: "aya.lahrar@optistyle.com",
+    phone: "+212 606 209 239",
+    image: "/images/rev/aa.jpeg"
+  },
+  {
+    name: "Mohamed Labiad",
     role: "Head of Operations",
     email: "labiad.mohamed@optistyle.com",
-    phone: "+212 600 000 003",
-    image: "https://ui-avatars.com/api/?name=Labiad+Mohamed&background=292077&color=fff&size=200"
+    phone: "+212 706 045 440",
+    image: "/images/rev/bb.jpeg"
   },
   {
-    name: "Bennay Aymane",
+    name: "Ayman Benai ",
     role: "Marketing Director",
-    email: "bennay.aymane@optistyle.com",
-    phone: "+212 600 000 004",
-    image: "https://ui-avatars.com/api/?name=Bennay+Aymane&background=d4af37&color=fff&size=200"
+    email: "benai.ayman@optistyle.com",
+    phone: "+212 617 665 299",
+    image: "/images/rev/dd.jpeg"
   }
 ];
 
@@ -82,9 +82,7 @@ export default function Contact() {
               <a href="#" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gray-400 hover:bg-[#292077] hover:text-white transition-colors shadow-sm">
                 <Linkedin className="w-4 h-4" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gray-400 hover:bg-[#292077] hover:text-white transition-colors shadow-sm">
-                <Github className="w-4 h-4" />
-              </a>
+             
             </div>
             
           </div>
