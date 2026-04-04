@@ -1,20 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { Minus, Plus, Trash2, ArrowLeft, ArrowRight, CheckCircle2, CreditCard, Truck, ShieldCheck, ShoppingBag, Info, User, ClipboardList } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getMyPanier, modifyPanierLigne, removePanierLigne, checkout, clearPanier } from '../api';
 
 const Cart = () => {
   // Step Management: 1 = Cart, 2 = Info & Payment, 3 = Confirmation, 4 = Success
   const [step, setStep] = useState(1);
+  const [cartData, setCartData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const [cartItems, setCartItems] = useState(() => {
-    const saved = localStorage.getItem("cart");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const fetchCart = async () => {
+    if (!localStorage.getItem('token')) {
+      setLoading(false);
+      return;
+    }
+    try {
+      setLoading(true);
+      const data = await getMyPanier();
+      setCartData(data);
+    } catch (err) {
+      if (err.message.includes('Session') || err.message.includes('autorisé')) {
+        setErrorMsg("Veuillez vous connecter pour voir votre panier.");
+      } else {
+        setErrorMsg("Erreur lors du chargement du panier.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cartItems));
-    window.dispatchEvent(new Event('cartUpdated'));
-  }, [cartItems]);
+    fetchCart();
+  }, []);
+
+  const cartItems = cartData?.lignes || [];
 
   const [promoCode, setPromoCode] = useState('');
   const [discount, setDiscount] = useState(0);
@@ -27,7 +47,7 @@ const Cart = () => {
   const [formErrors, setFormErrors] = useState({});
 
   // Calculations
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const subtotal = cartData?.total || 0;
   const discountAmount = subtotal * discount;
   const afterDiscount = subtotal - discountAmount;
   const isFreeShipping = afterDiscount > 2000;
@@ -35,17 +55,28 @@ const Cart = () => {
   const total = afterDiscount + shipping;
 
   // Handlers
-  const updateQuantity = (id, delta) => {
-    setCartItems(prev => prev.map(item => {
-      if (item.id === id) {
-        const newQ = item.quantity + delta;
-        return { ...item, quantity: newQ > 0 ? newQ : 1 };
+  const updateQuantity = async (id_ligne, delta, currentQuantity) => {
+    try {
+      const newQty = currentQuantity + delta;
+      if (newQty <= 0) {
+        await removePanierLigne(id_ligne);
+      } else {
+        await modifyPanierLigne({ id_ligne, quantite: newQty });
       }
-      return item;
-    }));
+      fetchCart();
+    } catch (err) {
+      alert("Erreur de modification de quantité");
+    }
   };
 
-  const removeItem = (id) => setCartItems(prev => prev.filter(i => i.id !== id));
+  const removeItem = async (id_ligne) => {
+    try {
+      await removePanierLigne(id_ligne);
+      fetchCart();
+    } catch (err) {
+      alert("Erreur de suppression");
+    }
+  };
 
   const handleApplyPromo = () => {
     if (promoCode.trim().toUpperCase() === 'OPTISTYLE20') {
@@ -88,9 +119,21 @@ const Cart = () => {
     }
   };
 
-  const finalizeOrder = () => {
-    setStep(4);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const finalizeOrder = async () => {
+    try {
+      setLoading(true);
+      await checkout({
+        adresse_livraison: `${formData.address}, ${formData.city}`,
+        methode_paiement: formData.paymentMethod === 'cmi' ? 'CARTE' : formData.paymentMethod === 'cod' ? 'VIREMENT' : 'PAYPAL'
+      });
+      setStep(4);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      alert(err.message || "Erreur de validation de commande");
+      setStep(2);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // --- Render Functions ---
@@ -198,42 +241,56 @@ const Cart = () => {
           <span className="text-sm font-semibold text-[#d4af37] bg-yellow-50 px-4 py-1.5 rounded-full border border-[#d4af37]/20">{cartItems.length} article(s)</span>
         </div>
 
-        {cartItems.length === 0 ? (
+        {!localStorage.getItem('token') ? (
+          <div className="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
+            <User className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Connectez-vous pour voir votre panier</h3>
+            <p className="text-gray-500 mb-6">Vous devez avoir un compte pour gérer votre panier.</p>
+            <Link to="/login" className="bg-[#292077] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#d4af37] transition-colors inline-block">
+              Se Connecter
+            </Link>
+          </div>
+        ) : cartItems.length === 0 ? (
           <div className="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
             <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-bold text-gray-900 mb-2">Votre panier est vide</h3>
             <p className="text-gray-500 mb-6">Découvrez nos nouvelles collections de lunettes.</p>
-            <Link to="/" className="bg-[#292077] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#d4af37] transition-colors">
+            <Link to="/" className="bg-[#292077] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#d4af37] transition-colors inline-block">
               Voir la boutique
             </Link>
           </div>
         ) : (
           <div className="space-y-6">
             {cartItems.map(item => (
-              <div key={item.id} className="group flex flex-col sm:flex-row gap-6 p-4 sm:p-6 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-[#292077]/30 hover:shadow-md transition-all">
+              <div key={item.id_ligne} className="group flex flex-col sm:flex-row gap-6 p-4 sm:p-6 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-[#292077]/30 hover:shadow-md transition-all">
                 <div className="w-full sm:w-36 h-36 bg-gray-50 rounded-xl overflow-hidden flex-shrink-0 relative">
-                  <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img 
+                    src={item.produit.image_url} 
+                    alt={item.produit.nom} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                    onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1572635196237-14b3f28150cc?w=400&q=80'; }}
+                  />
                 </div>
                 
                 <div className="flex-1 flex flex-col justify-between">
                   <div className="flex justify-between items-start gap-4">
-                    <div>
-                      <p className="text-xs font-bold text-gray-500 tracking-widest uppercase mb-1">{item.brand}</p>
-                      <h3 className="text-lg font-bold text-[#292077] mb-1">{item.name}</h3>
-                      <p className="text-sm text-gray-500 flex items-center gap-1">Couleur: <span className="font-medium text-gray-700">{item.color}</span></p>
-                    </div>
-                    <button onClick={() => removeItem(item.id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors" aria-label="Supprimer">
-                      <Trash2 className="w-5 h-5" />
-                    </button>
+                     <div>
+                       <p className="text-xs font-bold text-gray-500 tracking-widest uppercase mb-1">{item.produit.marque}</p>
+                       <h3 className="text-lg font-bold text-[#292077] mb-1">{item.produit.nom}</h3>
+                       <p className="text-sm text-gray-500 flex items-center gap-1">Couleur: <span className="font-medium text-gray-700">Défaut</span></p>
+                     </div>
+                     <button onClick={() => removeItem(item.id_ligne)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors" aria-label="Supprimer">
+                       <Trash2 className="w-5 h-5" />
+                     </button>
                   </div>
 
                   <div className="flex justify-between items-end mt-6 sm:mt-0">
                     <div className="flex items-center gap-4 bg-gray-50 rounded-lg p-1 border border-gray-200">
-                      <button onClick={() => updateQuantity(item.id, -1)} className="p-1.5 text-[#292077] hover:bg-white rounded shadow-sm transition-all"><Minus className="w-4 h-4" /></button>
-                      <span className="w-6 text-center font-bold text-sm text-[#292077]">{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.id, 1)} className="p-1.5 text-[#292077] hover:bg-white rounded shadow-sm transition-all"><Plus className="w-4 h-4" /></button>
+                      <button onClick={() => updateQuantity(item.id_ligne, -1, item.quantite)} className="p-1.5 text-[#292077] hover:bg-white rounded shadow-sm transition-all"><Minus className="w-4 h-4" /></button>
+                      <span className="w-6 text-center font-bold text-sm text-[#292077]">{item.quantite}</span>
+                      <button onClick={() => updateQuantity(item.id_ligne, 1, item.quantite)} className="p-1.5 text-[#292077] hover:bg-white rounded shadow-sm transition-all"><Plus className="w-4 h-4" /></button>
                     </div>
-                    <p className="text-xl font-black text-[#d4af37]">{(item.price * item.quantity).toLocaleString('fr-MA')} Dhs</p>
+                    <p className="text-xl font-black text-[#d4af37]">{item.sous_total.toLocaleString('fr-MA')} Dhs</p>
                   </div>
                 </div>
               </div>
@@ -414,12 +471,12 @@ const Cart = () => {
              <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Articles ({cartItems.length})</h3>
              <ul className="space-y-3">
                {cartItems.map((item) => (
-                 <li key={item.id} className="flex justify-between items-center text-sm border-b border-gray-50 pb-3 last:border-0 last:pb-0">
+                 <li key={item.id_ligne} className="flex justify-between items-center text-sm border-b border-gray-50 pb-3 last:border-0 last:pb-0">
                    <div className="flex items-center gap-3">
-                     <span className="font-bold text-[#292077] w-6 text-center bg-gray-100 rounded px-1">{item.quantity}x</span>
-                     <span className="text-gray-700 font-medium">{item.name}</span>
+                     <span className="font-bold text-[#292077] w-6 text-center bg-gray-100 rounded px-1">{item.quantite}x</span>
+                     <span className="text-gray-700 font-medium">{item.produit.nom}</span>
                    </div>
-                   <span className="font-bold text-[#d4af37]">{(item.price * item.quantity).toLocaleString('fr-MA')} Dhs</span>
+                   <span className="font-bold text-[#d4af37]">{item.sous_total.toLocaleString('fr-MA')} Dhs</span>
                  </li>
                ))}
              </ul>

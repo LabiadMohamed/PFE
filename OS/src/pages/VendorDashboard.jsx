@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   LayoutDashboard, ShoppingCart, PackageSearch, PlusCircle, Bell, Search, 
   Wallet, TrendingUp, Clock, MoreHorizontal, UploadCloud, ChevronRight, User
 } from 'lucide-react';
+import { getAllVendeurs, getVendeurProduits, getVendeurVentes, createProduit, getAllCategories } from '../api';
 
 const SIDEBAR_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -12,39 +13,92 @@ const SIDEBAR_ITEMS = [
   { id: 'add-product', label: 'Add Product', icon: PlusCircle },
 ];
 
-const STATS = [
-  { id: 1, title: 'Total Revenue', value: '$124,500.00', icon: Wallet },
-  { id: 2, title: 'Balance', value: '$45,200.00', icon: TrendingUp },
-  { id: 3, title: 'Pending', value: '$12,300.00', icon: Clock },
-];
-
-const RECENT_ORDERS = [
-  { id: '#ORD-9932', product: 'Aura Titanium', date: 'Oct 24, 2026', price: '$450.00', status: 'Processing' },
-  { id: '#ORD-9931', product: 'Eclipse Aviator', date: 'Oct 24, 2026', price: '$320.00', status: 'Shipped' },
-  { id: '#ORD-9930', product: 'Nova Classic', date: 'Oct 23, 2026', price: '$290.00', status: 'Delivered' },
-  { id: '#ORD-9929', product: 'Lumina Frames', date: 'Oct 23, 2026', price: '$180.00', status: 'Pending' },
-  { id: '#ORD-9928', product: 'Velocity Sport', date: 'Oct 22, 2026', price: '$210.00', status: 'Delivered' },
-];
-
-const INVENTORY = [
-  { id: 'PRD-001', name: 'Aura Titanium', image: 'https://images.unsplash.com/photo-1577803645773-f96470509666?q=80&w=400', stock: 124, price: '$450.00' },
-  { id: 'PRD-002', name: 'Eclipse Aviator', image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=400', stock: 8, price: '$320.00' },
-  { id: 'PRD-003', name: 'Nova Classic', image: 'https://images.unsplash.com/photo-1508296695146-257a814070b4?q=80&w=400', stock: 85, price: '$290.00' },
-  { id: 'PRD-004', name: 'Lumina Frames', image: 'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?q=80&w=400', stock: 0, price: '$180.00' },
-];
-
 const VendorDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [vendorId, setVendorId] = useState(null);
+  const [vendorStats, setVendorStats] = useState({ revenue: 0, balance: 0, pending: 0 });
+  const [orders, setOrders] = useState([]);
+  const [inventory, setInventory] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  // Form State
+  const [formData, setFormData] = useState({ nom: '', prix: '', marque: '', genre: 'HOMME', id_categorie: '' });
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    if (!user || user.role !== "VENDEUR") {
+      window.location.href = "/";
+      return;
+    }
+
+    const initData = async () => {
+      try {
+        const cats = await getAllCategories();
+        setCategories(cats);
+
+        const vends = await getAllVendeurs();
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        const v = vends.find(x => x.utilisateur.email === user.email);
+        if (v) {
+          setVendorId(v.id_vendeur);
+          const prods = await getVendeurProduits(v.id_vendeur);
+          setInventory(prods);
+
+          const sales = await getVendeurVentes(v.id_vendeur);
+          setOrders(sales);
+
+          const revenue = sales.reduce((sum, s) => sum + s.sous_total, 0);
+          setVendorStats({ revenue, balance: revenue * 0.8, pending: 0 }); // mockup balance based on revenue
+        }
+      } catch (err) {
+        console.error("Dashboard init error:", err);
+      }
+    };
+    initData();
+  }, []);
 
   const getStatusStyle = (status) => {
-    switch(status) {
-      case 'Delivered': return 'bg-[#292077]/10 text-[#292077]';
-      case 'Shipped': return 'bg-gray-100 text-[#292077]/80';
-      case 'Processing': return 'bg-[#d4af37]/10 text-[#d4af37]';
-      case 'Pending': return 'bg-gray-50 text-gray-500 border border-gray-200';
+    if(!status) return 'bg-gray-100 text-[#292077]';
+    switch(status.toUpperCase()) {
+      case 'EN_ATTENTE': return 'bg-gray-50 text-gray-500 border border-gray-200';
+      case 'PAYE': case 'REUSSI': case 'VALIDE': return 'bg-[#292077]/10 text-[#292077]';
+      case 'LIVRE': return 'bg-[#d4af37]/10 text-[#d4af37]';
+      case 'ANNULEE': case 'ANNULE': return 'bg-red-100 text-red-600';
       default: return 'bg-gray-100 text-[#292077]';
     }
   };
+
+  const handleAddProduct = async (e) => {
+    e.preventDefault();
+    if (!vendorId) {
+      alert("Vendor profile required");
+      return;
+    }
+    try {
+      await createProduit({
+        id_categorie: formData.id_categorie || (categories.length > 0 ? categories[0].id_categorie : null),
+        nom: formData.nom,
+        prix: parseFloat(formData.prix),
+        marque: formData.marque,
+        genre: formData.genre,
+        image_url: 'https://images.unsplash.com/photo-1572635196237-14b3f28150cc?w=400&q=80'
+      });
+      alert('Product created successfully!');
+      setFormData({ nom: '', prix: '', marque: '', genre: 'HOMME', id_categorie: '' });
+      // Refresh inventory
+      const prods = await getVendeurProduits(vendorId);
+      setInventory(prods);
+      setActiveTab('inventory');
+    } catch(err) {
+      alert(err.message);
+    }
+  };
+
+  const statsMap = [
+    { id: 1, title: 'Total Revenue', value: `$${vendorStats.revenue.toFixed(2)}`, icon: Wallet },
+    { id: 2, title: 'Balance', value: `$${vendorStats.balance.toFixed(2)}`, icon: TrendingUp },
+    { id: 3, title: 'Pending', value: `$${vendorStats.pending.toFixed(2)}`, icon: Clock },
+  ];
 
   const renderDashboard = () => (
     <motion.div 
@@ -57,7 +111,7 @@ const VendorDashboard = () => {
         <p className="text-sm font-serif italic text-gray-500 mt-1">Your store's performance at a glance.</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {STATS.map(stat => (
+        {statsMap.map(stat => (
           <div key={stat.id} className="bg-white p-8 rounded-2xl border border-gray-100 flex flex-col justify-between shadow-sm hover:shadow-lg transition-all hover:border-[#292077]/20 group">
             <div className="flex justify-between items-start mb-8">
               <div className="p-3 bg-gray-50 rounded-xl border border-gray-100 group-hover:bg-[#292077] transition-colors duration-300">
@@ -98,19 +152,24 @@ const VendorDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {RECENT_ORDERS.map((order) => (
-                <tr key={order.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
-                  <td className="py-5 px-8 text-sm font-black text-[#292077]">{order.id}</td>
-                  <td className="py-5 px-8 text-sm font-medium text-[#292077]/80">{order.product}</td>
-                  <td className="py-5 px-8 text-sm font-serif italic text-gray-500">{order.date}</td>
-                  <td className="py-5 px-8 text-sm font-black text-[#d4af37]">{order.price}</td>
+              {orders.map((order) => (
+                <tr key={order.id_ligne_cmd} className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
+                  <td className="py-5 px-8 text-sm font-black text-[#292077]">#{order.id_commande}</td>
+                  <td className="py-5 px-8 text-sm font-medium text-[#292077]/80">{order.nom_produit}</td>
+                  <td className="py-5 px-8 text-sm font-serif italic text-gray-500">{order.date_commande}</td>
+                  <td className="py-5 px-8 text-sm font-black text-[#d4af37]">${order.sous_total.toFixed(2)}</td>
                   <td className="py-5 px-8">
-                    <span className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg ${getStatusStyle(order.status)}`}>
-                      {order.status}
+                    <span className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg ${getStatusStyle(order.statut)}`}>
+                      {order.statut}
                     </span>
                   </td>
                 </tr>
               ))}
+              {orders.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="py-10 text-center text-gray-500 font-serif italic">No sales found.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -131,23 +190,30 @@ const VendorDashboard = () => {
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {INVENTORY.map((item) => (
-          <div key={item.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:border-[#d4af37]/30 transition-all group">
+        {inventory.map((item) => {
+          const defaultImg = item.image_url?.includes("placeholder") ? 'https://images.unsplash.com/photo-1572635196237-14b3f28150cc?w=400&q=80' : item.image_url;
+          const stockVal = item.stocks?.reduce((acc,s)=>acc+s.quantite,0) || 0;
+          return (
+          <div key={item.id_produit} className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:border-[#d4af37]/30 transition-all group">
             <div className="aspect-[4/3] bg-gray-50 relative overflow-hidden">
-              <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+              <img src={defaultImg || 'https://images.unsplash.com/photo-1572635196237-14b3f28150cc?w=400&q=80'} alt={item.nom} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                   onError={(e)=>{e.target.src='https://images.unsplash.com/photo-1572635196237-14b3f28150cc?w=400&q=80'}}/>
             </div>
             <div className="p-6">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="text-sm font-black uppercase tracking-wider text-[#292077]">{item.name}</h3>
-                <span className="text-sm font-bold text-[#d4af37]">{item.price}</span>
+                <h3 className="text-sm font-black uppercase tracking-wider text-[#292077]">{item.nom}</h3>
+                <span className="text-sm font-bold text-[#d4af37]">${item.prix}</span>
               </div>
               <div className="flex items-center gap-2 mt-4">
-                <span className={`w-2 h-2 rounded-full ${item.stock > 0 ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                <span className="text-xs font-bold uppercase tracking-widest text-[#292077]/60">{item.stock > 0 ? `${item.stock} in stock` : 'Out of stock'}</span>
+                <span className={`w-2 h-2 rounded-full ${stockVal > 0 ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                <span className="text-xs font-bold uppercase tracking-widest text-[#292077]/60">{stockVal > 0 ? `${stockVal} in stock` : 'Out of stock'}</span>
               </div>
             </div>
           </div>
-        ))}
+        )})}
+        {inventory.length === 0 && (
+          <div className="col-span-full py-10 text-center text-gray-500 font-serif italic">Your inventory is empty.</div>
+        )}
       </div>
     </motion.div>
   );
@@ -165,7 +231,7 @@ const VendorDashboard = () => {
         </div>
         
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 sm:p-10">
-          <form className="space-y-8">
+          <form className="space-y-8" onSubmit={handleAddProduct}>
             <div>
               <label className="block text-xs font-black uppercase tracking-widest text-[#292077] mb-3">Product Images</label>
               <div className="border-2 border-dashed border-gray-200 rounded-2xl p-12 flex flex-col items-center justify-center text-center hover:bg-[#d4af37]/5 hover:border-[#d4af37]/50 transition-colors cursor-pointer group">
@@ -173,34 +239,48 @@ const VendorDashboard = () => {
                   <UploadCloud className="w-5 h-5 text-[#292077]/60 group-hover:text-white" />
                 </div>
                 <p className="text-sm font-bold text-[#292077]">Click to upload or drag and drop</p>
-                <p className="text-xs font-serif italic text-gray-500 mt-1">SVG, PNG, JPG or GIF (max. 800x400px)</p>
+                <p className="text-xs font-serif italic text-gray-500 mt-1">Currently auto-provided via Unsplash</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
                 <label className="block text-xs font-black uppercase tracking-widest text-[#292077] mb-3">Product Name</label>
-                <input type="text" placeholder="e.g. Classic Aviator" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#292077]/20 focus:border-[#292077] transition-all text-[#292077] font-medium placeholder-gray-400" />
+                <input required type="text" value={formData.nom} onChange={(e)=>setFormData({...formData, nom: e.target.value})} placeholder="e.g. Classic Aviator" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#292077]/20 focus:border-[#292077] transition-all text-[#292077] font-medium placeholder-gray-400" />
               </div>
               
               <div>
-                <label className="block text-xs font-black uppercase tracking-widest text-[#292077] mb-3">Price</label>
-                <input type="text" placeholder="0.00" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#292077]/20 focus:border-[#292077] transition-all text-[#292077] font-medium placeholder-gray-400" />
+                <label className="block text-xs font-black uppercase tracking-widest text-[#292077] mb-3">Brand (Marque)</label>
+                <input required type="text" value={formData.marque} onChange={(e)=>setFormData({...formData, marque: e.target.value})} placeholder="e.g. Ray-Ban" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#292077]/20 focus:border-[#292077] transition-all text-[#292077] font-medium placeholder-gray-400" />
               </div>
 
               <div>
-                <label className="block text-xs font-black uppercase tracking-widest text-[#292077] mb-3">Stock Quantity</label>
-                <input type="number" placeholder="0" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#292077]/20 focus:border-[#292077] transition-all text-[#292077] font-medium placeholder-gray-400" />
+                <label className="block text-xs font-black uppercase tracking-widest text-[#292077] mb-3">Price</label>
+                <input required type="number" step="0.01" value={formData.prix} onChange={(e)=>setFormData({...formData, prix: e.target.value})} placeholder="0.00" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#292077]/20 focus:border-[#292077] transition-all text-[#292077] font-medium placeholder-gray-400" />
               </div>
 
-              <div className="md:col-span-2">
-                <label className="block text-xs font-black uppercase tracking-widest text-[#292077] mb-3">Description</label>
-                <textarea rows="4" placeholder="Briefly describe the product..." className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#292077]/20 focus:border-[#292077] transition-all text-[#292077] font-medium placeholder-gray-400 resize-none"></textarea>
+              <div>
+                <label className="block text-xs font-black uppercase tracking-widest text-[#292077] mb-3">Gender (Genre)</label>
+                <select value={formData.genre} onChange={(e)=>setFormData({...formData, genre: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#292077]/20 focus:border-[#292077] transition-all text-[#292077] font-medium">
+                  <option value="HOMME">Homme</option>
+                  <option value="FEMME">Femme</option>
+                  <option value="ENFANT">Enfant</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-black uppercase tracking-widest text-[#292077] mb-3">Category</label>
+                <select value={formData.id_categorie} onChange={(e)=>setFormData({...formData, id_categorie: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#292077]/20 focus:border-[#292077] transition-all text-[#292077] font-medium">
+                  <option value="">Select Category</option>
+                  {categories.map(cat => (
+                    <option key={cat.id_categorie} value={cat.id_categorie}>{cat.type} - {cat.description}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
             <div className="pt-4 flex justify-end">
-              <button type="button" className="bg-[#292077] text-white px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#d4af37] hover:shadow-[0_10px_20px_rgba(212,175,55,0.2)] transition-all">
+              <button type="submit" className="bg-[#292077] text-white px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#d4af37] hover:shadow-[0_10px_20px_rgba(212,175,55,0.2)] transition-all">
                 Publish Product
               </button>
             </div>
@@ -250,7 +330,7 @@ const VendorDashboard = () => {
               <User className="w-5 h-5 text-[#292077]" />
             </div>
             <div className="text-left">
-              <p className="text-xs font-black text-[#292077] uppercase tracking-wider">Store Admin</p>
+              <p className="text-xs font-black text-[#292077] uppercase tracking-wider">{JSON.parse(localStorage.getItem("user") || "{}").nom}</p>
               <p className="text-[10px] font-serif italic text-gray-500 mt-0.5">Vendor Account</p>
             </div>
           </div>

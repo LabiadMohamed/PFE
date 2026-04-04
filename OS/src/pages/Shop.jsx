@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { getAllProduits, addToPanier, getMyPanier, removePanierLigne, modifyPanierLigne } from '../api';
 import CTA from "../components/CTA";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -20,325 +21,7 @@ const COLORS = {
   m:        { hex: "#717dc1", label: "m" },
 };
 
-const productsData = [
-  // ── Optique ─ 12 ─────────────────────────────────────────
-  { id:1,forme: "Cat Eye", materiau: "Acétate",  tab:"Optique", category:"Femme",  name:"CORALIE",   price:50,  badge:null,
-    colors:[COLORS.rose, COLORS.navy, COLORS.tortoise, COLORS.black],
-    images:["/images/women/a.jfif", "/images/women/aa.jfif", "/images/women/aaa.jfif", "/images/women/aaaa.jfif"],
-    desc:"Monture acétate papillon. Légère et élégante pour un port quotidien." },
-
-  { id:2,forme: "Rond",    materiau: "Titane",tab:"Optique", category:"Homme",  name:"FAIDHERBE", price:50,  
-    colors:[COLORS.black, COLORS.silver, COLORS.gold, COLORS.tortoise],
-    images:["/images/b/x.jfif", "/images/b/xxx.jfif", "/images/b/xxxx.jfif", "/images/b/xx.jfif"],
-    desc:"Monture ronde classique en acétate. Disponible en de nombreuses couleurs." },
-
-  { id:3, forme: "Cat Eye", materiau: "Acétate", tab:"Optique", category:"Femme",  name:"ADELINE",   price:40,  badge:null,
-    colors:[COLORS.red, COLORS.black, COLORS.s, COLORS.silver],
-    images:["/images/women/bbb.jfif", "/images/women/b.jfif", "/images/women/bbbb.jfif", "/images/women/bb.jfif"],
-    desc:"Ovale délicat en acétate. Finitions soignées, style intemporel." },
-
-  { id:4, forme: "Aviateur",    materiau: "Titane", tab:"Optique", category:"Homme",  name:"XAV S",     price:50,  badge:"Nouveau",
-    colors:[COLORS.black, COLORS.tortoise, COLORS.tortoise, COLORS.gold],
-    images:["/images/men/a.jfif", "/images/men/aa.jfif", "/images/men/aaa.jfif", "/images/men/aaaa.jfif"],
-    desc:"Carré moderne en acétate. Monture robuste au look affirmé." },
-
-  { id:5, forme: "Rond", materiau: "Titane", tab:"Optique", category:"Femme",  name:"RACHEL",    price:50,  badge:null,
-    colors:[COLORS.rose, COLORS.black, COLORS.silver, COLORS.red],
-    images:["/images/women/c.jfif", "/images/women/cc.jfif", "/images/women/ccc.jfif", "/images/women/cccc.jfif"],
-    desc:"Papillon léger en métal. Détails dorés pour un look raffiné." },
-
-  { id:6, forme: "Aviateur",    materiau: "Acétate", tab:"Optique", category:"men",  name:"GEORGES",   price:40,  badge:null,
-    colors:[COLORS.black, COLORS.rose, ],
-    images:["/images/b/h.jfif", "/images/b/hh.jfif", ],
-    desc:"Rectangulaire en acétate. Format large, confort optimal." },
-
-  { id:7, forme: "Aviateur",    materiau: "Plastique", tab:"Optique", category:"Homme",  name:"BRETON",    price:45,  badge:null,
-    colors:[COLORS.black, COLORS.silver,],
-    images:["/images/b/e.jfif", "/images/b/ee.jfif", ],
-    desc:"Browline deux tons. Style vintage revisité en acétate premium." },
-
-  { id:8, forme: "Ovale",    materiau: "Titane", tab:"Optique", category:"Femme",  name:"CLAIRE",    price:55,  badge:"Nouveau",
-    colors:[COLORS.rose, COLORS.gold, COLORS.silver, COLORS.black],
-    images:["/images/women/d.jfif", "/images/women/dd.jfif", "/images/women/ddd.jfif", "/images/women/dddd.jfif"],
-    desc:"Ovale fin en métal doré. Élégance discrète pour tous les visages." },
-
-  { id:25, forme: "Rond", materiau: "Titane",tab:"Optique", category:"Homme",  name:"TITAN RX",  price:120, badge:"Premium",
-    colors:[COLORS.tortoise, COLORS.rose, COLORS.red, COLORS.black],
-    images:["/images/men/ccc.jfif", "/images/men/cc.jfif", "/images/men/cccc.jfif", "/images/men/c.jfif"],
-    desc:"Monture titane ultra-légère. Mémoire de forme, résistance maximale." },
-
-  { id:10, forme: "Carré",    materiau: "Métal",tab:"Optique", category:"Enfant",  name:"BOULEVARD", price:95,  badge:null,
-    colors:[COLORS.black,COLORS.s,],
-    images:["/images/kids/a.avif", "/images/kids/aa.avif"],
-    desc:"Carré large statement. Acétate épais, look audacieux et contemporain." },
-
-  { id:27,forme: "Cat Eye", materiau: "Acétate", tab:"Optique", category:"Femme",  name:"LÉONIE",    price:85,  badge:null,
-    colors:[COLORS.rose, COLORS.gold, COLORS.silver, COLORS.tortoise],
-    images:["/images/women/e.jfif", "/images/women/ee.jfif", "/images/women/eee.jfif", "/images/women/eeee.jfif"],
-    desc:"Cat-eye délicat en métal. Charnières à ressort pour un confort optimal." },
-
-  { id:28,forme: "Carré",    materiau: "Métal", tab:"Optique", category:"Homme",  name:"MARCUS",    price:75,  badge:"+2 couleurs",
-    colors:[COLORS.black, COLORS.s, COLORS.silver, COLORS.tortoise],
-    images:["/images/men/d.jfif", "/images/men/dd.jfif", "/images/men/ddd.jfif", "/images/men/dddd.jfif"],
-    desc:"Pilote rectangulaire en acétate. Monture épaisse pour un style affirmé." },
-    { id:30,forme: "Ovale", materiau: "Titane",  tab:"Optique", category:"Femme",  name:"Durand",   price:40,  badge:null,
-    colors:[COLORS.rose, COLORS.s, COLORS.silver, COLORS.tortoise],
-    images:["/images/a/a.jfif", "/images/a/aa.jfif", "/images/a/aaa.jfif", "/images/a/aaaa.jfif"],
-    desc:"Monture acétate papillon. Légère et élégante pour un port quotidien." },
-    { id:31, forme: "Ovale",    materiau: "Titane", tab:"Optique", category:"Homme",  name:"Xiv",     price:50,  badge:"+1 couleurs",
-    colors:[COLORS.black, COLORS.silver, COLORS.s, ],
-    images:["/images/b/a.jfif", "/images/b/aa.jfif", "/images/b/aaa.jfif", ],
-    desc:"Carré moderne en acétate. Monture robuste au look affirmé." },
-    { id:32,forme: "Ovale", materiau: "Titane",  tab:"Optique", category:"Femme",  name:"Percey",   price:40,  badge:null,
-    colors:[COLORS.red, COLORS.s, COLORS.black, COLORS.tortoise],
-    images:["/images/a/b.jfif", "/images/a/bb.jfif", "/images/a/bbb.jfif", "/images/a/bbbb.jfif"],
-    desc:"Monture acétate papillon. Légère et élégante pour un port quotidien." },
-    { id:33,forme: "Ovale", materiau: "Titane",  tab:"Optique", category:"Femme",  name:"Wilkey",   price:40,  badge:null,
-    colors:[COLORS.black, COLORS.s, COLORS.tortoise, ],
-    images:["/images/a/c.jfif", "/images/a/cc.jfif", "/images/a/ccc.jfif", ],
-    desc:"Monture acétate papillon. Légère et élégante pour un port quotidien." },
-    { id:34, forme: "Ovale",    materiau: "Titane", tab:"Optique", category:"Homme",  name:"Cran",     price:50,  badge:"+1 couleurs",
-    colors:[COLORS.tortoise, COLORS.red, COLORS.silver, COLORS.s],
-    images:["/images/b/b.jfif", "/images/b/bb.jfif", "/images/b/bbb.jfif", "/images/b/bbbb.jfif"],
-    desc:"Carré moderne en acétate. Monture robuste au look affirmé." },
-    { id:35, forme: "Ovale",    materiau: "Titane", tab:"Optique", category:"Homme",  name:"Brady",     price:50,  badge:"+1 couleurs",
-    colors:[COLORS.s, COLORS.d, COLORS.black, ],
-    images:["/images/b/c.jfif", "/images/b/cc.jfif", "/images/b/ccc.jfif", "/images/b/cccc.jfif"],
-    desc:"Carré moderne en acétate. Monture robuste au look affirmé." },
-    { id:36,forme: "Ovale", materiau: "Titane",  tab:"Optique", category:"Femme",  name:"Rice",   price:40,  badge:null,
-    colors:[COLORS.silver, COLORS.tortoise, COLORS.black, COLORS.s],
-    images:["/images/a/d.jfif", "/images/a/dd.jfif", "/images/a/ddd.jfif", "/images/a/dddd.jfif"],
-    desc:"Monture acétate papillon. Légère et élégante pour un port quotidien." },
-    { id:37, forme: "Ovale",    materiau: "Titane", tab:"Optique", category:"Homme",  name:"Nzami",     price:50,  badge:"+1 couleurs",
-    colors:[COLORS.s, COLORS.silver, ],
-    images:["/images/b/d.jfif", "/images/b/dd.jfif", ],
-    desc:"Carré moderne en acétate. Monture robuste au look affirmé." },
-    { id:38, forme: "Ovale",    materiau: "Titane", tab:"Optique", category:"Homme",  name:"Zala",     price:50,  badge:"+1 couleurs",
-    colors:[COLORS.black, COLORS.silver, ],
-    images:["/images/b/e.jfif", "/images/b/ee.jfif", ],
-    desc:"Carré moderne en acétate. Monture robuste au look affirmé." },
-    { id:39, forme: "Ovale",    materiau: "Titane", tab:"Optique", category:"Homme",  name:"Krimo",     price:50,  badge:"+1 couleurs",
-    colors:[COLORS.s, COLORS.tortoise, COLORS.g, COLORS.d],
-    images:["/images/b/f.jfif", "/images/b/ff.jfif", "/images/b/fff.jfif", ],
-    desc:"Carré moderne en acétate. Monture robuste au look affirmé." },
-    { id:40, forme: "Ovale",    materiau: "Titane", tab:"Optique", category:"Homme",  name:"Sima",     price:50,  badge:"+1 couleurs",
-    colors:[COLORS.black, COLORS.rose, COLORS.s, ],
-    images:["/images/b/g.jfif", "/images/b/gg.jfif", "/images/b/ggg.jfif", ],
-    desc:"Carré moderne en acétate. Monture robuste au look affirmé." },
-    { id:66,forme: "Cat Eye", materiau: "Acétate",  tab:"Optique", category:"Enfant",  name:"COR",   price:60,  badge:null,
-    colors:[COLORS.black, ],
-    images:["/images/kids/b.avif", ],
-    desc:"Monture acétate papillon. Légère et élégante pour un port quotidien." },
-    { id:67,forme: "Cat Eye", materiau: "Acétate",  tab:"Optique", category:"Enfant",  name:"COR",   price:60,  badge:null,
-    colors:[COLORS.n,COLORS.rose,COLORS.black, ],
-    images:["/images/kids/c.avif","/images/kids/cc.avif","/images/kids/ccc.avif"],
-    desc:"Monture acétate papillon. Légère et élégante pour un port quotidien." },
-    { id:68,forme: "Cat Eye", materiau: "Acétate",  tab:"Optique", category:"Enfant",  name:"COR",   price:60,  badge:null,
-    colors:[COLORS.black, ],
-    images:["/images/kids/a.avif", ],
-    desc:"Monture acétate papillon. Légère et élégante pour un port quotidien." },
-    { id:69,forme: "Cat Eye", materiau: "Acétate",  tab:"Optique", category:"Enfant",  name:"COR",   price:60,  badge:null,
-    colors:[COLORS.v,],
-    images:["/images/kids/d.avif", ],
-    desc:"Monture acétate papillon. Légère et élégante pour un port quotidien." },
-
-
-  // ── Solaire ─ 12 ─────────────────────────────────────────
-  { id:9, forme: " ", materiau: "", tab:"Solaire", category:"Homme",  name:"KENITO",    price:60,  badge:"Collab",
-    colors:[COLORS.tortoise, COLORS.green, COLORS.g, ],
-    images:["/images/m/a.jfif", "/images/m/aa.jfif", "/images/m/aaa.jfif", ],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-
-  { id:101, forme: "Aviateur", materiau: "Acétate",tab:"Solaire", category:"Femme",  name:"TINA2000",  price:50,  badge:"Collab",
-    colors:[COLORS.m, COLORS.rose, COLORS.silver,],
-    images:["/images/w/a.jfif", "/images/w/aa.jfif", "/images/w/aaa.jfif",],
-    desc:"Ovale rétro en métal fin. Verres roses tendance, monture délicate." },
-
-  { id:11,forme: "Cat Eye", materiau: "Acétate", tab:"Solaire", category:"Enfant",  name:"IZY20",     price:50,  badge:null,
-    colors:[COLORS.s,],
-    images:["/images/r/aa.jpg", ],
-    desc:"Carré acétate oversize. Style années 90, protection maximale." },
-
-  { id:12,forme: "Cat Eye", materiau: "Acétate", tab:"Solaire", category:"Homme",  name:"AVIATOR S", price:59,  badge:"Bestseller",
-    colors:[COLORS.black, COLORS.tortoise,],
-    images:["/images/m/b.jpg", "/images/m/bb.jpg",],
-    desc:"Aviateur classique titanium. Verres dégradés polarisés." },
-
-  { id:13, forme: "Ovale", materiau: "Acétate",tab:"Solaire", category:"Femme",  name:"CAT LUXE",  price:65,  badge:null,
-    colors:[COLORS.green, COLORS.black, COLORS.tortoise, ],
-    images:["/images/w/b.jfif", "/images/w/bb.jfif", "/images/w/bbb.jfif", ],
-    desc:"Cat-eye acétate épais. Fabriqué à la main en Italie." },
-
-  { id:14,forme: "Cat Eye", materiau: "Acétate", tab:"Solaire", category:"Enfant",  name:"HEXAGON",   price:70,  badge:"Limité",
-    colors:[COLORS.black, ],
-    images:["/images/r/b.jpg", ],
-    desc:"Hexagonal géométrique en acier inoxydable. Édition limitée." },
-
-  { id:15,forme: "Cat Eye", materiau: "Acétate", tab:"Solaire", category:"Homme",  name:"SHIELD",    price:75,  badge:"Nouveau",
-    colors:[COLORS.d, COLORS.black, COLORS.tortoise, ],
-    images:["/images/m/c.jpg", "/images/m/cc.jpg", "/images/m/ccc.jpg",],
-    desc:"Écran monobloc sport. Protection UV maximale, style futuriste." },
-
-  { id:29,forme: "Cat Eye", materiau: "Acétate", tab:"Solaire", category:"Homme",  name:"WAYFARER X",price:55,  badge:null,
-    colors:[COLORS.silver,],
-    images:["/images/m/d.jpg", ],
-    desc:"Wayfarer moderne en acétate épais. Verres dégradés UV400." },
-
-  { id:30,forme: "Papilon", materiau: "Acétate", tab:"Solaire", category:"Femme",  name:"PAPAYA",    price:48,  badge:"+3 couleurs",
-    colors:[COLORS.g,],
-    images:["/images/w/c.jfif", ],
-    desc:"Ovale tendance aux couleurs vives. Léger et ultra féminin." },
-
-  { id:31,forme: "Cat Eye", materiau: "Acétate", tab:"Solaire", category:"Enfant",  name:"SPORT PRO", price:80,  badge:"Nouveau",
-    colors:[COLORS.v, ],
-    images:["/images/r/c.jpg", ],
-    desc:"Enveloppant sportif TR-90. Verres interchangeables polarisés." },
-
-  { id:32,forme: "Cat Eye", materiau: "Acétate", tab:"Solaire", category:"Homme",  name:"MARCO",     price:62,  badge:null,
-    colors:[COLORS.black, COLORS.s, COLORS.tortoise, ],
-    images:["/images/m/e.jpg", "/images/m/ee.jpg", "/images/m/eee.jpg", ],
-    desc:"Rectangulaire acétate épais. Look vintage années 70 revisité." },
-
-  { id:16,forme: "Ovale", materiau: "Acétate", tab:"Solaire", category:"Femme",  name:"ROUND SOL", price:45,  badge:null,
-    colors:[COLORS.navy, COLORS.tortoise,  ],
-    images:["/images/w/d.jfif", "/images/w/dd.jfif", ],
-    desc:"Rond John Lennon en métal fin. Verres fumés, ultra léger." },
-    { id:102, forme: " ", materiau: "", tab:"Solaire", category:"Homme",  name:"Royal",    price:60,  badge:"Collab",
-    colors:[COLORS.tortoise, COLORS.d, ],
-    images:["/images/m/ff.jpg", "/images/m/f.jpg", ],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-    { id:103, forme: " ", materiau: "", tab:"Solaire", category:"Femme",  name:"Sweet",    price:60,  badge:"Collab",
-    colors:[COLORS.black, COLORS.navy, COLORS.s, ],
-    images:["/images/w/g.jpg", "/images/w/gg.jpg", "/images/w/ggg.jpg", ],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-    { id:104, forme: " Aviateur ", materiau: "", tab:"Solaire", category:"Homme",  name:"Classic",    price:60,  badge:"Collab",
-    colors:[COLORS.s,],
-    images:["/images/m/g.jpg", ],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-    { id:105, forme: " Cat Eye", materiau: "", tab:"Solaire", category:"Femme",  name:"Angel",    price:60,  badge:"Collab",
-    colors:[COLORS.black, COLORS.navy, COLORS.green, ],
-    images:["/images/w/e.jfif", "/images/w/ee.jfif", "/images/w/eee.jfif", ],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-    { id:106, forme: "Cat Eye ", materiau: "", tab:"Solaire", category:"Femme",  name:"Glam Eyes",    price:60,  badge:"Collab",
-    colors:[COLORS.s, ],
-    images:["/images/w/h.jpg",],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-    { id:107, forme: "Aviateur ", materiau: "", tab:"Solaire", category:"Homme",  name:"Noble Glass",    price:60,  badge:"Collab",
-    colors:[COLORS.n, COLORS.s,],
-    images:["/images/m/h.jfif", "/images/m/hh.jfif", ],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-    { id:108, forme: " ", materiau: "", tab:"Solaire", category:"Femme",  name:"Evil",    price:60,  badge:"Collab",
-    colors:[COLORS.rose, COLORS.navy, COLORS.gold,],
-    images:["/images/w/i.jpg", "/images/w/ii.jpg", "/images/w/iii.jpg",],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-    { id:109, forme: " ", materiau: "", tab:"Solaire", category:"Homme",  name:"Urban",    price:60,  badge:"Collab",
-    colors:[COLORS.green, COLORS.silver, COLORS.black,],
-    images:["/images/m/i.jfif", "/images/m/ii.jfif", "/images/m/iii.jfif",],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-    { id:110, forme: " Rond", materiau: "", tab:"Solaire", category:"Homme",  name:"Speed Loke",    price:60,  badge:"Collab",
-    colors:[COLORS.g, COLORS.tortoise, ],
-    images:["/images/m/j.jfif", "/images/m/jj.jfif", ],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-    { id:111, forme: " ", materiau: "", tab:"Solaire", category:"Femme",  name:"Luna chic",    price:60,  badge:"Collab",
-    colors:[COLORS.green,],
-    images:["/images/w/j.jpg",],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-    { id:112, forme: " ", materiau: "", tab:"Solaire", category:"Homme",  name:"Mazig",    price:60,  badge:"Collab",
-    colors:[COLORS.green,],
-    images:["/images/m/k.jfif", ],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-    { id:113, forme: " ", materiau: "", tab:"Solaire", category:"Enfant",  name:"Asmar",    price:60,  badge:"Collab",
-    colors:[COLORS.rose, ],
-    images:["/images/r/r.jpg",],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-    { id:119, forme: " ", materiau: "", tab:"Solaire", category:"Homme",  name:"EDAHEM",    price:60,  badge:"Collab",
-    colors:[COLORS.navy, ],
-    images:["/images/m/l.jfif", ],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-{ id:114, forme: " ", materiau: "", tab:"Solaire", category:"Enfant",  name:"Kadra",    price:60,  badge:"Collab",
-    colors:[COLORS.rose, ],
-    images:["/images/r/sss.webp", ],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-{ id:115, forme: " ", materiau: "", tab:"Solaire", category:"Enfant",  name:"Rharou",    price:60,  badge:"Collab",
-    colors:[COLORS.tortoise,],
-    images:["/images/r/d.jpg",],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-{ id:116, forme: " ", materiau: "", tab:"Solaire", category:"Enfant",  name:"Sva",    price:60,  badge:"Collab",
-    colors:[COLORS.navy, ],
-    images:["/images/r/ss.webp", ],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-{ id:117, forme: " ", materiau: "", tab:"Solaire", category:"Homme",  name:"KENITO",    price:60,  badge:"Collab",
-    colors:[COLORS.black, ],
-    images:["/images/m/m.jfif", ],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-{ id:118, forme: " ", materiau: "", tab:"Solaire", category:"Enfant",  name:"Domi",    price:60,  badge:"Collab",
-    colors:[COLORS.n, ],
-    images:["/images/r/s.webp", ],
-    desc:"Octogonal métal. Collaboration exclusive. Verres polarisés UV400." },
-
-
-
-  // ── Luxury ─ 12 ────────────────────────────────────────────
-  { id:17,forme: "Cat Eye", materiau: "Acétate", tab:"Luxury", category:"Homme", name:"TINY STAR", price:35, badge:"Kids",
-    colors:[COLORS.s, COLORS.tortoise, COLORS.black, ],
-    images:["/images/n/a.jpg", "/images/n/aaa.jpg", "/images/n/aa.jpg", ],
-    desc:"Monture étoile pour enfants. TR-90 flexible et résistant." },
-
-  { id:18, forme: "Ronde", materiau: "Acétate",tab:"Luxury", category:"Femme", name:"JR ROUND",  price:30, badge:null,
-    colors:[COLORS.rose,],
-    images:["/images/x/d.jpg", ],
-    desc:"Ronde douce pour les petits. Plaquettes caoutchouc confortables." },
-
-  { id:19, forme: "Cat Eye", materiau: "Acétate",tab:"Luxury", category:"Femme", name:"DINO",      price:38, badge:"Fun",
-    colors:[COLORS.rose, ],
-    images:["/images/x/a.jpg", ],
-    desc:"Accents dinosaure ludiques. Verres anti-rayures." },
-
-  { id:20,forme: " aviateur", materiau: "Acétate", tab:"Luxury", category:"Homme", name:"MINI AVI",  price:40, badge:null,
-    colors:[COLORS.black, COLORS.rose, ],
-    images:["/images/n/b.jpg", "/images/n/bb.jpg", ],
-    desc:"Mini aviateur pour enfants. Protection UV incluse." },
-
-  { id:21,forme: "Cat Eye", materiau: "Acétate", tab:"Luxury", category:"Enfant", name:"SPORTY JR", price:32, badge:null,
-    colors:[COLORS.rose,],
-    images:["/images/f/a.jpg",],
-    desc:"Enveloppant sport flexible. Verres incassables pour les actifs." },
-
-  { id:22, forme: "Cat Eye", materiau: "Acétate",tab:"Luxury", category:"Femme", name:"HEART",     price:28, badge:"Populaire",
-    colors:[COLORS.black, COLORS.rose,],
-    images:["/images/x/b.jpg", "/images/x/bb.jpg", "", ""],
-    desc:"Accent cœur pour filles. Léger et sécurisé." },
-
-  { id:23,forme: "Carré", materiau: "Acétate", tab:"Luxury", category:"Femme", name:"SQ PLAY",   price:33, badge:null,
-    colors:[COLORS.rose, ],
-    images:["/images/x/c.jpg", ],
-    desc:"Carré bold pour enfants. Branches caoutchouc antidérapantes." },
-
-  { id:24,forme: " Papillon", materiau: "Acétate", tab:"Luxury", category:"Homme", name:"BUTTERFLY", price:36, badge:"Nouveau",
-    colors:[COLORS.d, ],
-    images:["/images/n/c.jpg", ],
-    desc:"Papillon mignon pour filles 4-10 ans. Charnières flexibles." },
-
-  { id:33,forme: "Cat Eye", materiau: "Acétate", tab:"Luxury", category:"Homme", name:"RAINBOW",   price:29, badge:"+5 couleurs",
-    colors:[COLORS.black,],
-    images:["/images/n/d.jpg", ],
-    desc:"Monture arc-en-ciel colorée. Acétate souple, confort toute la journée." },
-
-  { id:34,forme: "Aviateur ", materiau: "Acétate", tab:"Luxury", category:"Femme", name:"PILOT JR",  price:37, badge:null,
-    colors:[COLORS.rose,],
-    images:["/images/x/e.jpg",],
-    desc:"Aviateur junior métal léger. Verres anti-UV pour les petits aventuriers." },
-
-  { id:35,forme: "Cat Eye", materiau: "Acétate", tab:"Luxury", category:"Enfant", name:"ROBO",      price:34, badge:"Fun",
-    colors:[COLORS.black,],
-    images:["/images/f/c.jpg", ],
-    desc:"Design robotique futuriste. TR-90 ultra résistant aux chocs." },
-
-  { id:36, forme: "Ovale Eye", materiau: "Acétate",tab:"Luxury", category:"Enfant", name:"FLOCON",    price:31, badge:null,
-    colors:[COLORS.rose,],
-    images:["/images/f/b.jpg", ],
-    desc:"Ovale doux pour les petites filles. Branches souples et sécurisées." },
-];
+// Mock data removed in favor of API
 
 const TABS         = ["Optique", "Solaire", "Luxury"];
 const GENRES       = ["Tous", "Femme", "Homme", "Enfant", ];
@@ -426,28 +109,22 @@ function QuickView({ product, onClose, onAddToCart }) {
 
  const navigate = useNavigate();
 
-const handleAdd = () => {
-  const currentCart = JSON.parse(localStorage.getItem("cart")) || [];
-  const newItem = {
-    id: product.id + "-" + selColor,
-    brand: product.tab || "OptiStyle",
-    name: product.name,
-    color: product.colors[selColor].label,
-    price: product.price,
-    quantity: qty,
-    image: currentImg
-  };
-  
-  const existingItemIndex = currentCart.findIndex(item => item.name === newItem.name && item.color === newItem.color);
-  if (existingItemIndex > -1) {
-    currentCart[existingItemIndex].quantity += qty;
-  } else {
-    currentCart.push(newItem);
+const handleAdd = async () => {
+  try {
+    await addToPanier({ id_produit: product.id, quantite: qty, prix_unitaire: product.price });
+    window.dispatchEvent(new Event('cartUpdated'));
+    onAddToCart && onAddToCart(); // Trigger refresh on parent
+    setAdded(true);
+    setTimeout(() => {
+        navigate("/cart");
+    }, 500);
+  } catch (err) {
+    if (err.message && err.message.includes('Session')) {
+        navigate("/login");
+    } else {
+        alert(err.message || "Erreur de panier");
+    }
   }
-
-  localStorage.setItem("cart", JSON.stringify(currentCart));
-  window.dispatchEvent(new Event('cartUpdated'));
-  navigate("/cart");
 };
 
   return (
@@ -518,15 +195,22 @@ function ProductCard({ product, onQuickView, onAddToCart, onToggleFav, isFav }) 
 
   const currentImg = product.images?.[selColor] || product.images?.[0] || "";
 const navigate = useNavigate();
-  const handleAdd = (e) => {
-  e.stopPropagation();
-
-  // (اختياري) تخزين product باش صاحبك يقراه
-  localStorage.setItem("cart", JSON.stringify([product]));
-
-  // توجيه ل page panier
-  navigate("/cart");
-};
+  const handleAdd = async (e) => {
+    e.stopPropagation();
+    try {
+      await addToPanier({ id_produit: product.id, quantite: 1, prix_unitaire: product.price });
+      window.dispatchEvent(new Event('cartUpdated'));
+      onAddToCart && onAddToCart();
+      setAdded(true);
+      navigate("/cart");
+    } catch (err) {
+      if (err.message && err.message.includes('Session')) {
+          navigate("/login");
+      } else {
+          alert(err.message || "Erreur lors de l'ajout au panier");
+      }
+    }
+  };
   return (
     <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
       // هاد السطر هو اللي زدت فيه الخلفية بيضاء والborder أزرق
@@ -590,8 +274,8 @@ const navigate = useNavigate();
   );
 }
 
-function CartSidebar({ cart, onClose, onRemove, onUpdateQty }) {
-  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+function CartSidebar({ cart, onClose, onRemove, onUpdateQty, totalObj }) {
+  const total = totalObj || 0;
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       <div className="absolute inset-0 bg-black/40" onClick={onClose}/>
@@ -614,22 +298,27 @@ function CartSidebar({ cart, onClose, onRemove, onUpdateQty }) {
             </div>
           )}
           {cart.map((item, idx) => (
-            <div key={idx} className="flex gap-3 items-start">
-              <img src={item.images?.[0] || ""} alt={item.name} className="w-14 h-14 object-cover rounded-lg bg-gray-100 flex-shrink-0"/>
+            <div key={item.id_ligne} className="flex gap-3 items-start">
+              <img 
+                src={item.produit?.image_url || 'https://images.unsplash.com/photo-1572635196237-14b3f28150cc?w=100&q=80'} 
+                alt={item.produit?.nom} 
+                className="w-14 h-14 object-cover rounded-lg bg-gray-100 flex-shrink-0"
+                onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1572635196237-14b3f28150cc?w=100&q=80'; }}
+              />
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-semibold text-[#292077] truncate">{item.name}</p>
+                <p className="text-[13px] font-semibold text-[#292077] truncate">{item.produit?.nom}</p>
                 <div className="flex items-center gap-1 mt-0.5">
-                  <span className="w-2.5 h-2.5 rounded-full border border-gray-200 flex-shrink-0" style={{ backgroundColor: item.color?.hex || "#1a1a1a" }}/>
-                  <p className="text-[11px] text-gray-400">{item.color?.label || "Color"}</p>
+                  <span className="w-2.5 h-2.5 rounded-full border border-gray-200 flex-shrink-0" style={{ backgroundColor: "#1a1a1a" }}/>
+                  <p className="text-[11px] text-gray-400">Défaut</p>
                 </div>
                 <div className="flex items-center gap-1.5 mt-1.5">
-                  <button onClick={() => onUpdateQty(idx, item.qty-1)} className="w-5 h-5 rounded-full border border-gray-300 text-xs flex items-center justify-center hover:bg-gray-100">−</button>
-                  <span className="text-xs font-medium w-4 text-center">{item.qty}</span>
-                  <button onClick={() => onUpdateQty(idx, item.qty+1)} className="w-5 h-5 rounded-full border border-gray-300 text-xs flex items-center justify-center hover:bg-gray-100">+</button>
-                  <span className="ml-auto text-[13px] font-semibold text-[#292077]">{item.price * item.qty}€</span>
+                  <button onClick={() => onUpdateQty(item.id_ligne, item.quantite-1)} className="w-5 h-5 rounded-full border border-gray-300 text-xs flex items-center justify-center hover:bg-gray-100">−</button>
+                  <span className="text-xs font-medium w-4 text-center">{item.quantite}</span>
+                  <button onClick={() => onUpdateQty(item.id_ligne, item.quantite+1)} className="w-5 h-5 rounded-full border border-gray-300 text-xs flex items-center justify-center hover:bg-gray-100">+</button>
+                  <span className="ml-auto text-[13px] font-semibold text-[#292077]">{item.sous_total}€</span>
                 </div>
               </div>
-              <button onClick={() => onRemove(idx)} className="text-gray-300 hover:text-red-400 transition flex-shrink-0 mt-0.5">
+              <button onClick={() => onRemove(item.id_ligne)} className="text-gray-300 hover:text-red-400 transition flex-shrink-0 mt-0.5">
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -642,9 +331,9 @@ function CartSidebar({ cart, onClose, onRemove, onUpdateQty }) {
             <div className="flex justify-between text-[14px] font-bold text-[#292077]">
               <span>Total</span><span>{total.toFixed(2)}€</span>
             </div>
-            <button className="w-full bg-[#292077] text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-[#d4af37] transition-colors">
+            <Link to="/cart" className="w-full flex items-center justify-center bg-[#292077] text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-[#d4af37] transition-colors">
               Commander
-            </button>
+            </Link>
           </div>
         )}
       </div>
@@ -654,7 +343,7 @@ function CartSidebar({ cart, onClose, onRemove, onUpdateQty }) {
 
 export default function Shop() {
   const [activeTab,  setActiveTab]  = useState("Optique");
-  const [cart,       setCart]       = useState([]);
+  const [cart,       setCart]       = useState(null);
   const [favorites,  setFavorites]  = useState([]);
   const [quickView,  setQuickView]  = useState(null);
   const [cartOpen,   setCartOpen]   = useState(false);
@@ -664,20 +353,72 @@ export default function Shop() {
   const [fMat,       setFMat]       = useState([]);
   const [fPrix,      setFPrix]      = useState([]);
 
+  const [productsData, setProductsData] = useState([]);
+
+  const fetchProducts = async () => {
+    try {
+      const data = await getAllProduits("?size=100");
+      const mapped = data.content.map(p => ({
+        id: p.id_produit,
+        nom: p.nom,
+        name: p.nom,
+        prix: p.prix,
+        price: p.prix,
+        marque: p.marque,
+        tab: p.categorie.type === 'VUE' ? 'Optique' : p.categorie.type === 'SOLEIL' ? 'Solaire' : 'Luxury',
+        category: p.genre === 'FEMME' ? 'Femme' : p.genre === 'HOMME' ? 'Homme' : 'Enfant',
+        genre: p.genre,
+        image_url: p.image_url && p.image_url.includes('placeholder') ? 'https://images.unsplash.com/photo-1572635196237-14b3f28150cc?w=400&q=80' : p.image_url,
+        images: [p.image_url && p.image_url.includes('placeholder') ? 'https://images.unsplash.com/photo-1572635196237-14b3f28150cc?w=400&q=80' : p.image_url],
+        colors: p.stocks && p.stocks.length > 0 ? p.stocks.map(s => COLORS[s.couleur.toLowerCase().substring(0,1)] || COLORS.black) : [COLORS.black],
+        desc: p.marque,
+        badge: null
+      }));
+      setProductsData(mapped);
+    } catch(err) {
+      console.error(err);
+    }
+  };
+
+  const fetchCart = async () => {
+    if (!localStorage.getItem('token')) return;
+    try {
+      const data = await getMyPanier();
+      setCart(data);
+    } catch(err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+    fetchCart();
+  }, []);
+
   const toggleF = (setter) => (val) =>
     setter(prev => prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]);
 
-  const addToCart = (product, qty=1, color=product.colors[0]) => {
-    setCart(prev => {
-      const idx = prev.findIndex(i => i.id===product.id && (i.color?.hex === color?.hex));
-      if (idx >= 0) return prev.map((item,i) => i===idx ? {...item, qty: item.qty+qty} : item);
-      return [...prev, {...product, qty, color}];
-    });
+  // addToCart is passed to QuickView and ProductCard to trigger a refresh of the cart
+  const addToCart = () => {
+    fetchCart();
   };
-  const removeFromCart = (idx) => setCart(p => p.filter((_,i) => i!==idx));
-  const updateQty = (idx, qty) => {
-    if (qty < 1) return removeFromCart(idx);
-    setCart(p => p.map((item,i) => i===idx ? {...item, qty} : item));
+
+  const removeFromCart = async (id_ligne) => {
+      try {
+          await removePanierLigne(id_ligne);
+          fetchCart();
+      } catch (err) {
+          alert('Erreur suppression');
+      }
+  };
+  const updateQty = async (id_ligne, qty) => {
+    if (qty < 1) return removeFromCart(id_ligne);
+    try {
+        await modifyPanierLigne({ id_ligne, quantite: qty });
+        fetchCart();
+    } catch (err) {
+        alert('Erreur modification quantite');
+    }
   };
   const toggleFav = (id) => setFavorites(p => p.includes(id) ? p.filter(f=>f!==id) : [...p, id]);
 
@@ -696,7 +437,7 @@ export default function Shop() {
   if (sortBy==="desc") list = [...list].sort((a,b) => b.price-a.price);
   if (sortBy==="name") list = [...list].sort((a,b) => a.name.localeCompare(b.name));
 
-  const cartCount    = cart.reduce((s,i) => s+i.qty, 0);
+  const cartItemsCount = cart?.lignes ? cart.lignes.reduce((s,i) => s+i.quantite, 0) : 0;
   const activeFilters = fGenre.length + fFormes.length + fMat.length + fPrix.length;
 
   return (
@@ -789,8 +530,8 @@ export default function Shop() {
       </div>
       <CTA/>
 
-      {quickView && <QuickView product={quickView} onClose={() => setQuickView(null)} onAddToCart={addToCart}/>}
-      {cartOpen  && <CartSidebar cart={cart} onClose={() => setCartOpen(false)} onRemove={removeFromCart} onUpdateQty={updateQty}/>}
+      {quickView && <QuickView product={quickView} onClose={() => setQuickView(null)} onAddToCart={addToCart} />}
+      {cartOpen  && <CartSidebar cart={cart?.lignes || []} totalObj={cart?.total || 0} onClose={() => setCartOpen(false)} onRemove={removeFromCart} onUpdateQty={updateQty}/>}
 
       <style>{`
         @keyframes fadeUp  { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:translateY(0) } }

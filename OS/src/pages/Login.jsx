@@ -11,12 +11,56 @@ const Login = () => {
   const [role, setRole] = useState('client'); // 'client' | 'vendor'
   const [isLogin, setIsLogin] = useState(true); // true = Login, false = Register
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [loading, setLoading] = useState(false);
   
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const bgImage = role === 'client' ? clientBg : vendorBg;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMsg('');
+    setLoading(true);
+
+    try {
+      const { login, registerAcheteur, registerVendeur } = await import('../api');
+      let response;
+
+      if (isLogin) {
+        response = await login({ email, mot_de_passe: password });
+      } else {
+        // Splitting full name naively
+        const parts = name.trim().split(' ');
+        const prenom = parts[0] || '';
+        const nom = parts.slice(1).join(' ') || prenom;
+
+        if (role === 'client') {
+          response = await registerAcheteur({ nom, prenom, email, mot_de_passe: password });
+        } else {
+          response = await registerVendeur({ nom, prenom, email, mot_de_passe: password, nom_boutique: name + " Shop", description: "Boutique Optique", telephone: "00000000" });
+        }
+      }
+
+      if (response && response.token) {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify({
+          id_utilisateur: response.id_utilisateur,
+          nom: response.nom,
+          prenom: response.prenom,
+          email: response.email,
+          role: response.role
+        }));
+        window.location.href = "/";
+      }
+    } catch (error) {
+      setErrorMsg(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center p-4 md:p-8 overflow-hidden bg-[#0a0a0c] font-sans">
@@ -136,8 +180,12 @@ const Login = () => {
           </div>
 
           {/* Form */}
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-            
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            {errorMsg && (
+              <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-2 text-xs mb-4">
+                {errorMsg}
+              </div>
+            )}
             <AnimatePresence mode="popLayout">
               {!isLogin && (
                 <motion.div 
@@ -226,7 +274,8 @@ const Login = () => {
             {/* Submit Button with Continuous Shine Effect */}
             <button 
               type="submit" 
-              className="group relative w-full mt-6 bg-[#292077] text-white py-3 rounded-lg text-sm font-black font-sans uppercase tracking-widest overflow-hidden shadow-lg hover:shadow-[#292077]/40 hover:-translate-y-1 transition-all duration-300 mb-2"
+              disabled={loading}
+              className={`group relative w-full mt-6 bg-[#292077] text-white py-3 rounded-lg text-sm font-black font-sans uppercase tracking-widest overflow-hidden shadow-lg hover:shadow-[#292077]/40 hover:-translate-y-1 transition-all duration-300 mb-2 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
               <motion.div 
                 className="absolute inset-0 bg-white/30 translate-x-[-150%] skew-x-[-45deg]"
@@ -234,7 +283,7 @@ const Login = () => {
                 transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }}
               />
               <span className="relative z-10 flex items-center justify-center gap-2">
-                {isLogin ? `Sign In ${role === 'vendor' ? 'as Partner' : ''}` : 'Create Account'}
+                {loading ? 'Chargement...' : (isLogin ? `Sign In ${role === 'vendor' ? 'as Partner' : ''}` : 'Create Account')}
               </span>
             </button>
 

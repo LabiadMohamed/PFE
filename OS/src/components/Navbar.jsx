@@ -1,91 +1,97 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { FiShoppingCart, FiMenu, FiX, FiArrowRight } from "react-icons/fi";
-<<<<<<< HEAD
 import { useState, useEffect } from "react";
-import logo from "../assets/Loge.png";
+import logo2 from "../assets/Logo2.jpeg";
 import { HashLink as Link } from "react-router-hash-link";
 import { useLocation } from "react-router-dom";
-=======
-import { useState } from "react";
-import logo from "../assets/Loge.png";
-import { HashLink as Link } from "react-router-hash-link";
-import { useLocation } from "react-router-dom"; // Vérifie bien cet import !
->>>>>>> 64c923227c0025b6dc09bbc8491cc2efc57447fe
+import { getMyPanier } from "../api";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
-<<<<<<< HEAD
   const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
-    const updateCount = () => {
-      const cart = JSON.parse(localStorage.getItem("cart")) || [];
-      const count = cart.reduce((total, item) => total + (item.quantity || 1), 0);
-      setCartCount(count);
+    const updateCount = async () => {
+      if (localStorage.getItem("token")) {
+        try {
+          const data = await getMyPanier();
+          const count = data.lignes ? data.lignes.reduce((total, item) => total + item.quantite, 0) : 0;
+          setCartCount(count);
+        } catch (err) {
+          console.error(err);
+        }
+      } else {
+        setCartCount(0);
+      }
     };
 
     updateCount();
-    window.addEventListener('storage', updateCount);
-    window.addEventListener('cartUpdated', updateCount);
+    window.addEventListener("cartUpdated", updateCount);
     return () => {
-      window.removeEventListener('storage', updateCount);
-      window.removeEventListener('cartUpdated', updateCount);
+      window.removeEventListener("cartUpdated", updateCount);
     };
   }, []);
 
   // Ensure this runs before rendering
-  // Ensure this runs before rendering
   if (location.pathname === "/login" || location.pathname.startsWith("/vendor")) {
-=======
-
-  // Cette ligne doit être AVANT tout le reste du code
-  if (location.pathname === "/login") {
->>>>>>> 64c923227c0025b6dc09bbc8491cc2efc57447fe
-    return null; 
+    return null;
   }
+
   return (
     <motion.nav
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: "circOut" }}
-<<<<<<< HEAD
-      // Floating effect
       className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl h-20 flex items-center justify-between px-8 bg-white/70 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] rounded-3xl"
     >
       {/* Logo - Scale animation on hover */}
       <motion.div whileHover={{ scale: 1.05 }} className="flex items-center justify-center">
         <Link to="/" className="flex items-center h-full pb-1">
-          <img src={logo} alt="Logo" className="h-12 w-auto object-contain" />
+          <img src={logo2} alt="Logo" className="h-12 w-auto object-contain" />
         </Link>
       </motion.div>
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex items-center gap-10">
-        {["Home", "Features", "Shop", "Categories", "Vendor", "Contact"].map((item) => (
-          item === "Vendor" ? (
+        {["Home", "Features", "Shop", "Categories", "Vendor", "Contact"].map((item) => {
+          if (item === "Vendor") {
+            const user = JSON.parse(localStorage.getItem("user") || "{}");
+            if (user.role !== "VENDEUR") return null;
+            return (
             <Link
               key={item}
               to="/vendor/dashboard"
               className="relative group text-sm font-bold text-[#292077] hover:text-[#d4af37] transition-colors"
-              style={{ marginTop: '2px' }}
+              style={{ marginTop: "2px" }}
             >
               Vendor
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#d4af37] transition-all duration-300 group-hover:w-full" />
             </Link>
-          ) : (
+            );
+          } else {
+            return (
             <Link
               key={item}
               smooth
-              to={item === "Home" ? "/#home" : item === "Contact" ? "/contact" : item === "Shop" ? "/shop" : `/#${item.toLowerCase()}`}
+              to={
+                item === "Home"
+                  ? "/#home"
+                  : item === "Contact"
+                  ? "/contact"
+                  : item === "Shop"
+                  ? "/shop"
+                  : `/#${item.toLowerCase()}`
+              }
               className="relative group text-sm font-semibold text-gray-600 hover:text-black transition-colors"
-              style={{ marginTop: '2px' }}
+              style={{ marginTop: "2px" }}
             >
               {item}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full" />
             </Link>
-          )
-        ))}
+            );
+          }
+        })}
       </div>
 
       {/* Right side - Buttons */}
@@ -108,51 +114,6 @@ export default function Navbar() {
           Login <FiArrowRight />
         </Link>
 
-=======
-      // Effet flottant : on ajoute une marge et un arrondi
-      className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl h-20 flex items-center justify-between px-8 bg-white/70 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] rounded-3xl"
-    >
-      {/* Logo - Animation Scale au Hover */}
-      <motion.div whileHover={{ scale: 1.05 }} className="flex items-center">
-        <Link to="/">
-          <img src={logo} alt="Logo" className="h-16 w-auto object-contain" />
-        </Link>
-      </motion.div>
-
-      {/* Desktop Navigation - Liens avec soulignement animé */}
-      <div className="hidden md:flex items-center gap-10">
-        {["Home", "Features", "Shop", "Categories"].map((item) => (
-          <Link
-            key={item}
-            smooth
-            to={`/#${item.toLowerCase()}`}
-            className="relative group text-sm font-semibold text-gray-600 hover:text-black transition-colors"
-          >
-            {item}
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full" />
-          </Link>
-        ))}
-      </div>
-
-      {/* Right side - Buttons stylés */}
-      <div className="flex items-center gap-6">
-        {/* Cart avec badge discret */}
-        <div className="relative group cursor-pointer">
-          <FiShoppingCart className="w-6 h-6 text-gray-700 group-hover:text-indigo-600 transition-colors" />
-          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] text-white">
-            0
-          </span>
-        </div>
-
-        {/* Login Button - Gradient & Shadow */}
-        <Link
-          to="/login"
-          className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white text-sm font-bold rounded-2xl hover:bg-indigo-600 hover:shadow-lg hover:shadow-indigo-200 transition-all duration-300"
-        >
-          Login <FiArrowRight />
-        </Link>
-
->>>>>>> 64c923227c0025b6dc09bbc8491cc2efc57447fe
         {/* Mobile Toggle */}
         <button
           className="md:hidden p-2 bg-gray-100 rounded-xl text-2xl"
@@ -162,11 +123,7 @@ export default function Navbar() {
         </button>
       </div>
 
-<<<<<<< HEAD
       {/* Mobile Menu - Slide Down Animation */}
-=======
-      {/* Mobile Menu - Animation Slide Down */}
->>>>>>> 64c923227c0025b6dc09bbc8491cc2efc57447fe
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -175,9 +132,11 @@ export default function Navbar() {
             exit={{ opacity: 0, y: -20 }}
             className="absolute top-24 left-0 w-full bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl p-8 flex flex-col items-center gap-6 md:hidden border border-gray-100"
           >
-<<<<<<< HEAD
-            {["Home", "Features", "Shop", "Categories", "Vendor", "Contact"].map((item) => (
-              item === "Vendor" ? (
+            {["Home", "Features", "Shop", "Categories", "Vendor", "Contact"].map((item) => {
+              if (item === "Vendor") {
+                const user = JSON.parse(localStorage.getItem("user") || "{}");
+                if (user.role !== "VENDEUR") return null;
+                return (
                 <Link
                   key={item}
                   to="/vendor/dashboard"
@@ -186,30 +145,29 @@ export default function Navbar() {
                 >
                   Vendor
                 </Link>
-              ) : (
+                );
+              } else {
+                return (
                 <Link
                   key={item}
                   smooth
-                  to={item === "Home" ? "/#home" : item === "Contact" ? "/contact" : item === "Shop" ? "/shop" : `/#${item.toLowerCase()}`}
+                  to={
+                    item === "Home"
+                      ? "/#home"
+                      : item === "Contact"
+                      ? "/contact"
+                      : item === "Shop"
+                      ? "/shop"
+                      : `/#${item.toLowerCase()}`
+                  }
                   onClick={() => setMenuOpen(false)}
                   className="text-lg font-bold text-gray-800"
                 >
                   {item}
                 </Link>
-              )
-=======
-            {["Home", "Features", "Shop", "Categories"].map((item) => (
-              <Link
-                key={item}
-                smooth
-                to={`/#${item.toLowerCase()}`}
-                onClick={() => setMenuOpen(false)}
-                className="text-lg font-bold text-gray-800"
-              >
-                {item}
-              </Link>
->>>>>>> 64c923227c0025b6dc09bbc8491cc2efc57447fe
-            ))}
+                );
+              }
+            })}
             <Link
               to="/login"
               className="w-full text-center py-4 bg-indigo-600 text-white rounded-2xl font-bold"
