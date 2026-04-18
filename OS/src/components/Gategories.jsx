@@ -11,7 +11,7 @@ import glass13 from "../assets/glass13.jpeg";
 const categories = [
   {
     id: "01",
-    title: "EYEGLASSES",
+    title: "Optical",
     subtitle: "Everyday clarity",
     desc: "Discover our premium selection of optical frames crafted for durability and all-day comfort. Experience vision like never before.",
     icon: Glasses,
@@ -20,7 +20,7 @@ const categories = [
   },
   {
     id: "02",
-    title: "SUNGLASSES",
+    title: "Sun",
     subtitle: "UV Protection",
     desc: "Elevate your outdoor style with our luxury prescription sunglasses, offering maximum UV protection without compromising elegance.",
     icon: Sun,

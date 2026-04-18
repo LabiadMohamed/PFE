@@ -41,8 +41,24 @@ public class Produit {
     @Column(nullable = false)
     private Genre genre;
 
-    @Column
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String image_url;
+
+    @Column(columnDefinition = "JSON")
+    private String colors;
+
+    @Column(columnDefinition = "JSON")
+    private String images;
+
+    @Column(length = 50)
+    private String forme;
+
+    @Column(length = 50)
+    private String materiau;
+
+    @Column(length = 50)
+    private String badge;
 
     @OneToMany(mappedBy = "produit", cascade = CascadeType.ALL)
     private List<Stock> stocks;

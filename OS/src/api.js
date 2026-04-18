@@ -25,12 +25,16 @@ export const authFetch = async (url, options = {}) => {
         headers,
     });
 
-    if (response.status === 401 || response.status === 403) {
+    if (response.status === 401) {
         if (url.includes("/login")) {
              throw new Error("Email ou mot de passe incorrect.");
         }
         clearAuth();
-        throw new Error("Session expirée ou accès non autorisé. Veuillez vous reconnecter.");
+        throw new Error("Session expirée. Veuillez vous reconnecter.");
+    }
+
+    if (response.status === 403) {
+        throw new Error("Accès non autorisé pour cette ressource.");
     }
 
     if (!response.ok) {
@@ -61,6 +65,7 @@ export const getProduitById = (id) => authFetch(`/api/produits/${id}`, { method:
 export const getProduitsByGenre = (genre) => authFetch(`/api/produits/genre/${genre}`, { method: "GET" });
 export const getProduitsByCategorie = (idCategorie) => authFetch(`/api/produits/categorie/${idCategorie}`, { method: "GET" });
 export const createProduit = (data) => authFetch("/api/produits", { method: "POST", body: JSON.stringify(data) });
+export const deleteProduit = (id) => authFetch(`/api/produits/${id}`, { method: "DELETE" });
 
 // ======================= CATEGORIES =======================
 export const getAllCategories = () => authFetch("/api/categories", { method: "GET" });

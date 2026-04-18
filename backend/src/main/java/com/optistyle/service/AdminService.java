@@ -85,6 +85,27 @@ public class AdminService {
                 .build();
     }
 
+    public UtilisateurResponse updateUtilisateur(Integer id, com.optistyle.dto.request.UtilisateurUpdateRequest request) {
+        Utilisateur user = utilisateurRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur non trouvé"));
+
+        user.setNom(request.getNom());
+        user.setPrenom(request.getPrenom());
+        user.setEmail(request.getEmail());
+        user.setRole(request.getRole());
+
+        Utilisateur saved = utilisateurRepository.save(user);
+
+        return UtilisateurResponse.builder()
+                .id_utilisateur(saved.getId_utilisateur())
+                .nom(saved.getNom())
+                .prenom(saved.getPrenom())
+                .email(saved.getEmail())
+                .role(saved.getRole())
+                .date_inscription(saved.getDate_inscription())
+                .build();
+    }
+
     public void deleteUtilisateur(Integer id) {
         if (!utilisateurRepository.existsById(id)) {
             throw new ResourceNotFoundException("Utilisateur non trouvé");

@@ -26,4 +26,9 @@ public class ProduitCreateRequest {
     private Produit.Genre genre;
 
     private String image_url;
+    private String colors;
+    private String images;
+    private String forme;
+    private String materiau;
+    private String badge;
 }

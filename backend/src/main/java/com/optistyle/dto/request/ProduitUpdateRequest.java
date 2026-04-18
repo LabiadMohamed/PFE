@@ -23,6 +23,11 @@ public class ProduitUpdateRequest {
     private Produit.Genre genre;
 
     private String image_url;
+    private String colors;
+    private String images;
+    private String forme;
+    private String materiau;
+    private String badge;
 
     @NotNull(message = "La catégorie est requise")
     private Integer id_categorie;

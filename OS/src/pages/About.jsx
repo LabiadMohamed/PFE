@@ -6,10 +6,10 @@ import CTA from '../components/CTA';
 const About = () => {
   // داتا ديال المؤسسين بـ 4 (الستيل اللي عجبك)
   const founders = [
-    { name: "Founder Name 1", role: "Creative Lead", img: "/images/rev/aa.jpeg", bio: "Defining the visual aesthetic of modern eyewear." },
-    { name: "Founder Name 2", role: "Optical Expert", img: "/images/rev/bb.jpeg", bio: "Ensuring medical precision in every single lens." },
-    { name: "Founder Name 3", role: "Operations", img: "/images/rev/cc.jpeg", bio: "Managing the gold standard of our supply chain." },
-    { name: "Founder Name 4", role: "Style Advisor", img: "/images/rev/dd.jpeg", bio: "Helping you find the frame that tells your story." },
+    { name: "Aya Lahrar", role: "Creative Lead", img: "/images/rev/aa.jpeg", bio: "Defining the visual aesthetic of modern eyewear." },
+    { name: "Mohamed Labiad", role: "Optical Expert", img: "/images/rev/bb.jpeg", bio: "Ensuring medical precision in every single lens." },
+    { name: "Mohamed Amin Ressa", role: "Operations", img: "/images/rev/cc.jpeg", bio: "Managing the gold standard of our supply chain." },
+    { name: "Ayman Benai", role: "Style Advisor", img: "/images/rev/dd.jpeg", bio: "Helping you find the frame that tells your story." },
   ];
 
   // داتا ديال Why Choose Us
@@ -50,7 +50,7 @@ const About = () => {
           >
             <h2 className="text-[#d4af37] font-bold text-sm capitalize tracking-[0.3em] mb-4"></h2>
             <h1 className="text-6xl md:text-8xl font-black text-[#292077] capitalize leading-[0.9] tracking-tighter mb-8">
-              How Are <br />
+              Who Are <br />
               <span className="text-[#d4af37] capitalize">We?</span>
             </h1>
             <p className="text-xl text-gray-500 font-medium leading-relaxed border-l-4 border-[#d4af37] pl-6 max-w-2xl">

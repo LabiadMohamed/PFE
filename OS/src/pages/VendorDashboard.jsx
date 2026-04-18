@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Link, useNavigate } from 'react-router-dom';
+import logo2 from '../assets/Loge.png';
 import { 
   LayoutDashboard, ShoppingCart, PackageSearch, PlusCircle, Bell, Search, 
   Wallet, TrendingUp, Clock, MoreHorizontal, UploadCloud, ChevronRight, User
 } from 'lucide-react';
-import { getAllVendeurs, getVendeurProduits, getVendeurVentes, createProduit, getAllCategories } from '../api';
+import { getAllVendeurs, getVendeurProduits, getVendeurVentes, createProduit, deleteProduit, getAllCategories } from '../api';
 
 const SIDEBAR_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -14,41 +16,40 @@ const SIDEBAR_ITEMS = [
 ];
 
 const VendorDashboard = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [vendorId, setVendorId] = useState(null);
   const [vendorStats, setVendorStats] = useState({ revenue: 0, balance: 0, pending: 0 });
   const [orders, setOrders] = useState([]);
   const [inventory, setInventory] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [user, setUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("user")); } catch(e) { return null; }
+  });
 
   // Form State
-  const [formData, setFormData] = useState({ nom: '', prix: '', marque: '', genre: 'HOMME', id_categorie: '' });
+  const [formData, setFormData] = useState({ nom: '', prix: '', marque: '', genre: 'HOMME', id_categorie: '', image_url: '' });
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    if (!user || user.role !== "VENDEUR") {
-      window.location.href = "/";
-      return;
-    }
-
     const initData = async () => {
       try {
         const cats = await getAllCategories();
         setCategories(cats);
 
-        const vends = await getAllVendeurs();
+        const vends = (await getAllVendeurs()) || [];
         const user = JSON.parse(localStorage.getItem("user") || "{}");
-        const v = vends.find(x => x.utilisateur.email === user.email);
+        // Use optional chaining to prevent crash if x.utilisateur is missing
+        const v = vends.find(x => x.utilisateur?.email === user.email);
         if (v) {
           setVendorId(v.id_vendeur);
-          const prods = await getVendeurProduits(v.id_vendeur);
+          const prods = (await getVendeurProduits(v.id_vendeur)) || [];
           setInventory(prods);
 
-          const sales = await getVendeurVentes(v.id_vendeur);
+          const sales = (await getVendeurVentes(v.id_vendeur)) || [];
           setOrders(sales);
 
-          const revenue = sales.reduce((sum, s) => sum + s.sous_total, 0);
-          setVendorStats({ revenue, balance: revenue * 0.8, pending: 0 }); // mockup balance based on revenue
+          const revenue = sales.reduce((sum, s) => sum + (s.sous_total || 0), 0);
+          setVendorStats({ revenue, balance: revenue * 0.8, pending: 0 }); 
         }
       } catch (err) {
         console.error("Dashboard init error:", err);
@@ -81,16 +82,30 @@ const VendorDashboard = () => {
         prix: parseFloat(formData.prix),
         marque: formData.marque,
         genre: formData.genre,
-        image_url: 'https://images.unsplash.com/photo-1572635196237-14b3f28150cc?w=400&q=80'
+        image_url: formData.image_url || 'https://images.unsplash.com/photo-1572635196237-14b3f28150cc?w=400&q=80',
+        stock: [
+          { couleur: "Noir", taille: "M", quantite: 10 }
+        ]
       });
       alert('Product created successfully!');
-      setFormData({ nom: '', prix: '', marque: '', genre: 'HOMME', id_categorie: '' });
-      // Refresh inventory
-      const prods = await getVendeurProduits(vendorId);
-      setInventory(prods);
-      setActiveTab('inventory');
+      setFormData({ nom: '', prix: '', marque: '', genre: 'HOMME', id_categorie: '', image_url: '' });
+      
+      // Navigate statically to the shop layout so state refreshes dynamically
+      navigate('/shop');
     } catch(err) {
       alert(err.message);
+    }
+  };
+
+  const handleDeleteProduct = async (id_produit) => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      try {
+        await deleteProduit(id_produit);
+        const prods = await getVendeurProduits(vendorId);
+        setInventory(prods);
+      } catch (err) {
+        alert("Failed to delete product: " + err.message);
+      }
     }
   };
 
@@ -196,6 +211,13 @@ const VendorDashboard = () => {
           return (
           <div key={item.id_produit} className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:border-[#d4af37]/30 transition-all group">
             <div className="aspect-[4/3] bg-gray-50 relative overflow-hidden">
+              <button 
+                onClick={() => handleDeleteProduct(item.id_produit)} 
+                className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/90 shadow-sm flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-colors"
+                title="Delete Product"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+              </button>
               <img src={defaultImg || 'https://images.unsplash.com/photo-1572635196237-14b3f28150cc?w=400&q=80'} alt={item.nom} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
                    onError={(e)=>{e.target.src='https://images.unsplash.com/photo-1572635196237-14b3f28150cc?w=400&q=80'}}/>
             </div>
@@ -234,13 +256,32 @@ const VendorDashboard = () => {
           <form className="space-y-8" onSubmit={handleAddProduct}>
             <div>
               <label className="block text-xs font-black uppercase tracking-widest text-[#292077] mb-3">Product Images</label>
-              <div className="border-2 border-dashed border-gray-200 rounded-2xl p-12 flex flex-col items-center justify-center text-center hover:bg-[#d4af37]/5 hover:border-[#d4af37]/50 transition-colors cursor-pointer group">
-                <div className="w-12 h-12 bg-white rounded-full shadow-sm border border-gray-100 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-[#292077] group-hover:text-white transition-all">
-                  <UploadCloud className="w-5 h-5 text-[#292077]/60 group-hover:text-white" />
-                </div>
-                <p className="text-sm font-bold text-[#292077]">Click to upload or drag and drop</p>
-                <p className="text-xs font-serif italic text-gray-500 mt-1">Currently auto-provided via Unsplash</p>
-              </div>
+              <label className="border-2 border-dashed border-gray-200 rounded-2xl p-12 flex flex-col items-center justify-center text-center hover:bg-[#d4af37]/5 hover:border-[#d4af37]/50 transition-colors cursor-pointer group relative overflow-hidden">
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  className="hidden" 
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => setFormData({...formData, image_url: reader.result});
+                      reader.readAsDataURL(file);
+                    }
+                  }} 
+                />
+                {formData.image_url ? (
+                   <img src={formData.image_url} alt="Preview" className="absolute inset-0 w-full h-full object-contain bg-white" />
+                ) : (
+                  <>
+                    <div className="w-12 h-12 bg-white rounded-full shadow-sm border border-gray-100 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-[#292077] group-hover:text-white transition-all">
+                      <UploadCloud className="w-5 h-5 text-[#292077]/60 group-hover:text-white" />
+                    </div>
+                    <p className="text-sm font-bold text-[#292077]">Click to upload</p>
+                    <p className="text-xs font-serif italic text-gray-500 mt-1">Supports PNG, JPG</p>
+                  </>
+                )}
+              </label>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -291,15 +332,15 @@ const VendorDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#fafafa] flex font-sans text-[#292077]">
+    <div className="h-screen w-full bg-[#fafafa] flex font-sans text-[#292077] overflow-hidden">
       
       {/* SIDEBAR */}
-      <aside className="sticky top-0 h-screen w-64 bg-white border-r border-[#292077]/10 flex flex-col shrink-0 z-20">
-        <div className="h-24 flex items-center px-8 border-b border-[#292077]/5">
-          <div className="w-10 h-10 bg-[#292077] rounded-xl flex items-center justify-center mr-3 shadow-lg shadow-[#292077]/20">
-            <span className="font-black text-[#d4af37] text-xl leading-none">O</span>
-          </div>
-          <h1 className="text-xl font-black tracking-wider uppercase">Opti<span className="text-[#d4af37] italic font-serif capitalize font-normal tracking-normal text-lg">Style</span></h1>
+      <aside className="h-full w-64 bg-white border-r border-[#292077]/10 flex flex-col shrink-0 z-20">
+        <div className="h-24 flex items-center px-4 sm:px-8 border-b border-[#292077]/5 hover:bg-gray-50 transition-colors cursor-pointer">
+          <Link to="/" className="flex items-center w-full h-full">
+            <img src={logo2} alt="OptiStyle Logo" className="h-10 w-auto object-contain mr-3 rounded" />
+            <span className="text-2xl font-black text-[#292077] tracking-tighter">OptiStyle</span>
+          </Link>
         </div>
 
         <div className="p-6">
@@ -330,7 +371,7 @@ const VendorDashboard = () => {
               <User className="w-5 h-5 text-[#292077]" />
             </div>
             <div className="text-left">
-              <p className="text-xs font-black text-[#292077] uppercase tracking-wider">{JSON.parse(localStorage.getItem("user") || "{}").nom}</p>
+              <p className="text-xs font-black text-[#292077] uppercase tracking-wider">{user?.nom || "Vendor"}</p>
               <p className="text-[10px] font-serif italic text-gray-500 mt-0.5">Vendor Account</p>
             </div>
           </div>
@@ -338,56 +379,46 @@ const VendorDashboard = () => {
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 flex flex-col min-h-screen relative max-w-full overflow-hidden">
+      <main className="flex-1 flex flex-col h-full relative max-w-full overflow-hidden">
         
         {/* HEADER */}
         <header className="h-24 border-b border-[#292077]/10 bg-white/80 backdrop-blur-md sticky top-0 z-10 flex items-center justify-between px-10">
           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#292077]/50">
-            <span>Platform</span>
+            <Link to="/" className="hover:text-[#d4af37] cursor-pointer transition-colors">Platform</Link>
             <ChevronRight className="w-3 h-3 text-[#d4af37]" />
             <span className="text-[#292077]">{SIDEBAR_ITEMS.find(i => i.id === activeTab)?.label}</span>
           </div>
 
           <div className="flex items-center gap-5">
-            <div className="relative hidden sm:block">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#292077]/40" />
-              <input 
-                type="text" 
-                placeholder="Quick search..." 
-                className="pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-[#292077]/50 focus:bg-white transition-all text-xs font-medium text-[#292077] w-64"
-              />
-            </div>
-            <button className="p-2.5 relative bg-white border border-gray-200 rounded-full hover:border-[#d4af37] transition-all text-[#292077] group">
-              <Bell className="w-4 h-4 group-hover:text-[#d4af37] transition-colors" />
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-[#d4af37] rounded-full border-2 border-white"></span>
-            </button>
-            <div className="w-10 h-10 rounded-full bg-gray-100 border-2 border-white shadow-md overflow-hidden cursor-pointer hover:border-[#d4af37] transition-all">
-              <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100&auto=format&fit=crop" alt="User Profile" className="w-full h-full object-cover" />
-            </div>
+            {/* Icons removed per user request */}
           </div>
         </header>
 
-        {/* PAGE CONTENT */}
-        <div className="flex-1 p-8 sm:p-10 max-w-7xl mx-auto w-full">
-          <AnimatePresence mode="wait">
-            {activeTab === 'dashboard' && renderDashboard()}
-            {activeTab === 'sales' && renderSales()}
-            {activeTab === 'inventory' && renderInventory()}
-            {activeTab === 'add-product' && renderAddProduct()}
-          </AnimatePresence>
-        </div>
-
-        {/* FOOTER */}
-        <footer className="border-t border-[#292077]/10 mt-auto py-8 px-10 bg-white">
-          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-xs font-serif italic text-gray-500">OptiStyle © 2024. All rights reserved.</p>
-            <div className="flex gap-6 text-[10px] font-black uppercase tracking-widest text-[#292077]/60">
-              <a href="#" className="hover:text-[#d4af37] transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-[#d4af37] transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-[#d4af37] transition-colors">Help Center</a>
+        {/* PAGE CONTENT - Scrollable Area */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          <div className="p-8 sm:p-10 max-w-7xl mx-auto w-full min-h-full flex flex-col">
+            <div className="flex-1">
+              <AnimatePresence mode="wait">
+                {activeTab === 'dashboard' && renderDashboard()}
+                {activeTab === 'sales' && renderSales()}
+                {activeTab === 'inventory' && renderInventory()}
+                {activeTab === 'add-product' && renderAddProduct()}
+              </AnimatePresence>
             </div>
+
+            {/* FOOTER - Inside Scrollable Area at bottom */}
+            <footer className="border-t border-[#292077]/10 mt-12 py-8 bg-white/50 rounded-2xl">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4 px-6">
+                <p className="text-xs font-serif italic text-gray-500">OptiStyle © 2024. All rights reserved.</p>
+                <div className="flex gap-6 text-[10px] font-black uppercase tracking-widest text-[#292077]/60">
+                  <a href="#" className="hover:text-[#d4af37] transition-colors">Terms of Service</a>
+                  <a href="#" className="hover:text-[#d4af37] transition-colors">Privacy Policy</a>
+                  <a href="#" className="hover:text-[#d4af37] transition-colors">Help Center</a>
+                </div>
+              </div>
+            </footer>
           </div>
-        </footer>
+        </div>
       </main>
     </div>
   );

@@ -45,11 +45,11 @@ export default function FeatureSection() {
         {/* Section Header */}
         <div className="text-center mb-16 md:mb-24 flex flex-col items-center">
   <div className="max-w-2xl">
-    <h4 className="text-[#d4af37] font-black text-sm tracking-[0.3em] uppercase mb-4 flex items-center justify-center gap-4">
+    <h4 className="text-[#d4af37] font-black text-sm tracking-[0.3em] uppercase  flex items-center justify-center gap-4">
       <div className="w-8 h-px bg-[#d4af37]"></div>
       Signature Collection
     </h4>
-    <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-[#292077] tracking-tighter uppercase mb-6 leading-[1.1]">
+    <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-[#292077] tracking-tighter uppercase  leading-[1.1]">
       Uncompromising <br className="hidden md:block"/>
       <span className="text-[#d4af37] italic font-serif capitalize font-normal">Excellence</span>
     </h2>

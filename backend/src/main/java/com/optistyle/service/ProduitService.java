@@ -22,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ public class ProduitService {
     private final CategorieRepository categorieRepository;
     private final VendeurRepository vendeurRepository;
     private final UtilisateurRepository utilisateurRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     public Page<ProduitResponse> getAllProduits(Produit.Genre genre, Integer idCategorie, String marque,
             BigDecimal minPrix, BigDecimal maxPrix, String keyword, Pageable pageable) {
@@ -75,6 +77,11 @@ public class ProduitService {
                 .image_url(request.getImage_url())
                 .categorie(categorie)
                 .vendeur(vendeur)
+                .colors(request.getColors())
+                .images(request.getImages())
+                .forme(request.getForme())
+                .materiau(request.getMateriau())
+                .badge(request.getBadge())
                 .stocks(new ArrayList<>())
                 .build();
 
@@ -97,6 +104,11 @@ public class ProduitService {
         produit.setGenre(request.getGenre());
         produit.setImage_url(request.getImage_url());
         produit.setCategorie(categorie);
+        produit.setColors(request.getColors());
+        produit.setImages(request.getImages());
+        produit.setForme(request.getForme());
+        produit.setMateriau(request.getMateriau());
+        produit.setBadge(request.getBadge());
 
         return mapToResponse(produitRepository.save(produit));
     }
@@ -107,6 +119,11 @@ public class ProduitService {
                 .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé"));
                 
         checkOwnershipOrAdmin(produit);
+
+        // Manually delete foreign key dependencies (shopping carts and past order connections)
+        jdbcTemplate.update("DELETE FROM ligne_paniers WHERE id_produit = ?", id);
+        jdbcTemplate.update("DELETE FROM ligne_commandes WHERE id_produit = ?", id);
+
         produitRepository.delete(produit);
     }
 
@@ -130,6 +147,7 @@ public class ProduitService {
                 .description(produit.getCategorie().getDescription())
                 .build();
 
+
         return ProduitResponse.builder()
                 .id_produit(produit.getId_produit())
                 .nom(produit.getNom())
@@ -137,6 +155,11 @@ public class ProduitService {
                 .marque(produit.getMarque())
                 .genre(produit.getGenre())
                 .image_url(produit.getImage_url())
+                .colors(produit.getColors())       // ✅ new
+                .images(produit.getImages())       // ✅ new
+                .forme(produit.getForme())         // ✅ new
+                .materiau(produit.getMateriau())   // ✅ new
+                .badge(produit.getBadge())
                 .categorie(catRes)
                 .id_vendeur(produit.getVendeur().getId_vendeur())
                 .nom_boutique(produit.getVendeur().getNom_boutique())

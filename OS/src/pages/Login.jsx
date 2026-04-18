@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Mail, Lock, Eye, EyeOff, Shield, Sparkles, User, Briefcase, ChevronLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 // Import images
 import clientBg from "../assets/ay.jpeg";
 import vendorBg from "../assets/g4.jpeg";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [role, setRole] = useState('client'); // 'client' | 'vendor'
   const [isLogin, setIsLogin] = useState(true); // true = Login, false = Register
   const [showPassword, setShowPassword] = useState(false);
@@ -53,7 +54,13 @@ const Login = () => {
           email: response.email,
           role: response.role
         }));
-        window.location.href = "/";
+        if (response.role === "VENDEUR") {
+          navigate("/vendor/dashboard");
+        } else if (response.role === "ADMIN") {
+          navigate("/admin-dashboard");
+        } else {
+          navigate("/");
+        }
       }
     } catch (error) {
       setErrorMsg(error.message);

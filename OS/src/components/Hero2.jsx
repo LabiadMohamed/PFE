@@ -25,12 +25,12 @@ const WarbyHero = () => {
           </h1>
           
           <div className="flex flex-wrap gap-4 mb-10">
-            <button className="bg-[#1d52ce] text-white px-9 py-4 rounded-full font-bold text-[14px] hover:bg-blue-700 transition-all active:scale-95">
+            <Link to="/shop" className="bg-[#1d52ce] text-white px-9 py-4 rounded-full font-bold text-[14px] hover:bg-blue-700 transition-all active:scale-95 inline-block">
               Shop eyeglasses
-            </button>
-            <button className="bg-[#00143a] text-white px-9 py-4 rounded-full font-bold text-[14px] hover:bg-black transition-all active:scale-95">
+            </Link>
+            <Link to="/shop" className="bg-[#00143a] text-white px-9 py-4 rounded-full font-bold text-[14px] hover:bg-black transition-all active:scale-95 inline-block">
               Shop sunglasses
-            </button>
+            </Link>
           </div>
 <Link to="/about" className="text-[#1d52ce] font-bold text-[15px] flex items-center group hover:underline">
   about us
